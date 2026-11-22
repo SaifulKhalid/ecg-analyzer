@@ -18,6 +18,9 @@ permitted helper second opinion.
 | 4 Image digitizer | 75 min | Complete | 30 min | 18 image tests, 14-case round-trip gate, actual browser multipart upload pass |
 | 5 GPT comparison | 25 min | Complete | 20.3 min | 10 paired real GPT replies; HR MAE 0.00823 vs 0.02047; categorical accuracy ties at 100% |
 | 6 Wrap + checks | 5 min | Complete | 4.3 min | 62 Python + 27 Node tests; build / live UI / data-secret audit pass; README complete |
+| 7 Fresh synthetic validation | 15 min | In progress | 4 min | Continuation 12:50 UTC; predeclared unused parameters / seeds, DSP frozen |
+| 8 Optional provider compatibility | 15 min | Pending | 0 | Strict temperature 0.2 remains default; explicit opt-in only |
+| 9 Continuation wrap | 5 min | Pending | 0 | Checks, docs / results and final commits before 13:33:48 UTC |
 
 ## Recon and assumptions
 
@@ -205,3 +208,15 @@ The paired HR improvement is very small in absolute bpm and follows an openly
 recorded analytic correction on the same benchmark. Both methods tie on the
 ±3 bpm and RR-label metrics. Current AgentRouter models reject explanation
 temperature 0.2, so explanation can remain null while measured results work.
+
+## Continuation assumptions
+
+- 12:50:15 UTC — User requested continue. The original 13:33:48 UTC hard stop
+  persists; elapsed time is not reset. Prior deliverables and comparisons stay intact.
+- Prioritize fresh synthetic validation with an immutable measurement-code hash
+  and a committed manifest before any new GPT calls. No DSP changes or data training.
+- Then add an explicit optional compatibility setting for unsupported-temperature
+  models. The existing strict 0.2 policy remains the default; provider-default
+  fallback must be requested and transparently identified in the response / UI.
+- Generated PNGs remain ignored; cases, scalar results and protocol hashes are
+  reviewable artifacts. No original GPT result will be overwritten or selected by error.

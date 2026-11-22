@@ -1,0 +1,151 @@
+{
+  "prepared_utc": "2026-11-22T12:56:33.259894+00:00",
+  "seed": 20261123,
+  "prepared_git_commit": "af1c2805c944cfc5222d76eb1ce5ec8821fa21ef",
+  "measurement_fingerprint": "df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925",
+  "measurement_files": [
+    "config",
+    "preprocess",
+    "peaks",
+    "features",
+    "classify",
+    "quality",
+    "digitize",
+    "plots",
+    "synth"
+  ],
+  "sampling": "HR uniformly drawn from 45\u2013130 bpm; all cases / noise / timing / polarity fixed before GPT requests.",
+  "cases": [
+    {
+      "case_id": "holdout_01",
+      "parameters": {
+        "hr": 48.75,
+        "noise": 0.0961,
+        "mains_amplitude": 0.1126,
+        "baseline_wander": 0.1703,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261123
+      }
+    },
+    {
+      "case_id": "holdout_02",
+      "parameters": {
+        "hr": 65.12,
+        "noise": 0.0941,
+        "mains_amplitude": 0.1627,
+        "baseline_wander": 0.1333,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261124
+      }
+    },
+    {
+      "case_id": "holdout_03",
+      "parameters": {
+        "hr": 50.6,
+        "noise": 0.0986,
+        "mains_amplitude": 0.0338,
+        "baseline_wander": 0.2323,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261125
+      }
+    },
+    {
+      "case_id": "holdout_04",
+      "parameters": {
+        "hr": 81.8,
+        "noise": 0.0221,
+        "mains_amplitude": 0.0354,
+        "baseline_wander": 0.1183,
+        "irregular": true,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261126
+      }
+    },
+    {
+      "case_id": "holdout_05",
+      "parameters": {
+        "hr": 107.19,
+        "noise": 0.0701,
+        "mains_amplitude": 0.1951,
+        "baseline_wander": 0.2319,
+        "irregular": false,
+        "invert": true,
+        "duration": 12.0,
+        "seed": 20261127
+      }
+    },
+    {
+      "case_id": "holdout_06",
+      "parameters": {
+        "hr": 88.88,
+        "noise": 0.0195,
+        "mains_amplitude": 0.1988,
+        "baseline_wander": 0.1203,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261128
+      }
+    },
+    {
+      "case_id": "holdout_07",
+      "parameters": {
+        "hr": 90.26,
+        "noise": 0.0337,
+        "mains_amplitude": 0.0562,
+        "baseline_wander": 0.1498,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261129
+      }
+    },
+    {
+      "case_id": "holdout_08",
+      "parameters": {
+        "hr": 51.65,
+        "noise": 0.018,
+        "mains_amplitude": 0.0216,
+        "baseline_wander": 0.2427,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261130
+      }
+    },
+    {
+      "case_id": "holdout_09",
+      "parameters": {
+        "hr": 116.91,
+        "noise": 0.0772,
+        "mains_amplitude": 0.1665,
+        "baseline_wander": 0.0428,
+        "irregular": true,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261131
+      }
+    },
+    {
+      "case_id": "holdout_10",
+      "parameters": {
+        "hr": 46.06,
+        "noise": 0.0303,
+        "mains_amplitude": 0.1756,
+        "baseline_wander": 0.2452,
+        "irregular": false,
+        "invert": true,
+        "duration": 12.0,
+        "seed": 20261132
+      }
+    }
+  ],
+  "training": "none"
+}
