@@ -88,14 +88,20 @@ export default {
       }
       if (!env.ECG_API_URL) return jsonResponse(503, { error: 'Configure ECG_API_URL with a reachable FastAPI DSP service.' });
       const response = await fetch(new URL(route[1], env.ECG_API_URL), {
-        method: request.method, headers, body, signal: controller.signal, redirect: 'error',
+        method: request.method, headers, body, signal: controller.signal, redirect: 'manual',
       });
+      if (response.status >= 300 && response.status < 400) {
+        await response.body?.cancel();
+        throw new Error('The configured ECG DSP service returned an unexpected redirect.');
+      }
       console.log(JSON.stringify({ event: 'ecg_measured_proxy', path: route[1], status: response.status,
         durationMs: Math.round(performance.now() - started) }));
       return new Response(response.body, { status: response.status,
         headers: { 'Content-Type': response.headers.get('content-type') || 'application/json',
           'Cache-Control': 'no-store', ...securityHeaders } });
     } catch (error) {
+      console.error(JSON.stringify({ event: 'ecg_measured_proxy_error', path: route[1],
+        name: error.name, message: error.message, durationMs: Math.round(performance.now() - started) }));
       return jsonResponse(error.status || (controller.signal.aborted ? 504 : 503), {
         error: error.status ? error.message : controller.signal.aborted
           ? 'The measured analysis took too long. Please try again.'

@@ -40,6 +40,7 @@ test('Worker proxies demo and raw signal JSON without AgentRouter credentials', 
   globalThis.fetch = async (url, options) => {
     assert.equal(String(url), 'https://dsp.example/analyze-signal');
     assert.equal(options.headers.Authorization, undefined);
+    assert.equal(options.redirect, 'manual');
     assert.equal(JSON.parse(new TextDecoder().decode(options.body)).sample_id, 'synth-regular');
     return Response.json({ status: 'ok', measurements: { hr_mean_bpm: 72 }, explanation: null });
   };
@@ -59,4 +60,20 @@ test('Worker converts legacy images to the same measured multipart endpoint', as
     return Response.json({ status: 'ok', measurements: { hr_mean_bpm: 72 } });
   };
   assert.equal((await worker.fetch(post('/api/analyze', { image, pixels_per_mm: 8 }), env)).status, 200);
+});
+
+test('Worker rejects backend redirects without following or forwarding them', async t => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  let canceled = false;
+  globalThis.fetch = async (_url, options) => {
+    assert.equal(options.redirect, 'manual');
+    return new Response(new ReadableStream({ cancel() { canceled = true; } }), {
+      status: 307, headers: { Location: 'https://unexpected.example' },
+    });
+  };
+  const response = await worker.fetch(new Request(origin + '/health'), env);
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('location'), null);
+  assert.equal(canceled, true);
 });
