@@ -266,7 +266,7 @@ The newly supplied local 600×333 sample works with crop `[35,224,555,294]` and
 manual 2.4 px/mm (observed HR 74.59 bpm). That scale is an assumption, not reference
 accuracy evidence. The original image is preserved and excluded from Git.
 
-## Existing Cloudflare deployment
+## Production deployment
 
 The Worker / Vite build remains supported. With Node 22.18+, run `npm run build`.
 This machine's Node 22.14 required an isolated runtime for verification:
@@ -275,9 +275,29 @@ This machine's Node 22.14 required an isolated runtime for verification:
 npm.cmd exec --yes --package=node@22.18.0 -c "cf build"
 ```
 
-The Worker proxies measured endpoints to a reachable FastAPI service configured
-by `ECG_API_URL`. That service needs Python and Node for the shared AgentRouter
-bridge. The old live site was not deployed by this mission; hosting the DSP
-service is required before publishing the measured version.
+The frontend runs on Cloudflare Workers. The Worker proxies measured endpoints
+to the FastAPI backend configured by `ECG_API_URL` at build time. Deploy the
+backend first, then build and deploy the frontend with that public HTTPS URL.
+
+The backend uses Vercel's Container preset and [Dockerfile.vercel](Dockerfile.vercel).
+It includes Python 3.13, Node 22.18 for the existing explanation bridge, and the
+pinned API dependencies in [requirements-runtime.txt](requirements-runtime.txt).
+It listens on port 80. Configure `AGENTROUTER_API_KEY` and
+`AGENTROUTER_API_KEY_2` as encrypted production environment variables in Vercel;
+credential files are excluded from the build context and image. The production
+image serves the four synthetic demos; cached MIT-BIH data stays local.
+
+Vercel builds the container from the Git repository, so Docker is not required
+on this Windows machine. Container Functions scale to zero after five minutes
+idle and can take longer on the first request. Vercel's request/response limit
+is 4.5 MB; production uploads must fit within that limit, even though the local
+API accepts images up to 10 MB. AI explanation remains optional and retains
+the existing strict-temperature and numeric-grounding checks.
+
+```powershell
+$env:ECG_API_URL = 'https://YOUR_BACKEND.vercel.app'
+npm.cmd exec --yes --package=node@22.18.0 -c "cf build"
+npm.cmd exec --yes --package=node@22.18.0 -c "cf deploy --prebuilt"
+```
 
 **Educational screening tool, not a medical device.**
