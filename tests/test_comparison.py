@@ -91,3 +91,27 @@ def test_offline_history_preserves_predictions_after_client_change(tmp_path, mon
     assert result["metrics"]["gpt_hr_coverage"] == 1
     assert result["cases"][0]["gpt"]["heart_rate_bpm"] == 45
     assert result["cases"][0]["gpt"]["source_protocol_fingerprint"] == "original client protocol"
+
+
+def test_mixed_legacy_protocol_metadata_has_explicit_unknown_value(tmp_path):
+    legacy = {"case_id": "legacy", **row(60, 60, 60)}
+    recent = {"case_id": "recent", **row(70, 70, 70)}
+    legacy["gpt"]["source_protocol_fingerprint"] = None
+    recent["gpt"]["source_protocol_fingerprint"] = "recent"
+    result = compare_gpt.write_report([legacy, recent], tmp_path, "measurement")
+    assert result["gpt_prediction_protocol_fingerprints"] == ["recent", "unknown_legacy"]
+    assert result["metrics"]["paired_count"] == 2
+
+
+def test_unavailable_initial_gpt_score_is_not_imputed_or_declared_better(tmp_path):
+    import json
+
+    missing = compare_gpt.comparison_metrics([row(60, None, 60, gpt_status="not_run", gpt_rhythm="unknown")])
+    (tmp_path / "comparison-initial.json").write_text(json.dumps({"metrics": missing}))
+    current = {"case_id": "measured", **row(60, 65, 60)}
+    result = compare_gpt.write_report([current], tmp_path, "measurement")
+    text = (tmp_path / "comparison.md").read_text(encoding="utf-8")
+    assert result["initial_run_metrics"]["gpt_paired_hr_mae_bpm"] is None
+    assert "not available" in text
+    assert "GPT had lower error" not in text
+    assert "no initial advantage" in result["revision_note"]

@@ -101,7 +101,7 @@ def write_report(rows: list[dict], output_dir: Path, fingerprint: str) -> dict:
     metrics = comparison_metrics(rows)
     summary = {"generated_utc": datetime.now(timezone.utc).isoformat(), "code_fingerprint": fingerprint,
                "gpt_protocol_fingerprint": gpt_protocol_fingerprint(),
-               "gpt_prediction_protocol_fingerprints": sorted({row["gpt"].get("source_protocol_fingerprint", gpt_protocol_fingerprint())
+               "gpt_prediction_protocol_fingerprints": sorted({row["gpt"].get("source_protocol_fingerprint", gpt_protocol_fingerprint()) or "unknown_legacy"
                                                                 for row in rows if row["gpt"]["status"] in ("ok", "no_estimate")}),
                "seed": cfg.COMPARISON_SEED, "duration_seconds": cfg.COMPARISON_DURATION_SECONDS,
                "gpt_input": "same image only; printed calibration; model default temperature",
@@ -168,16 +168,26 @@ def write_report(rows: list[dict], output_dir: Path, fingerprint: str) -> dict:
         initial = json.loads(initial_path.read_text(encoding="utf-8"))
         initial_metrics = initial["metrics"]
         summary["initial_run_metrics"] = initial_metrics
-        summary["revision_note"] = "After the first run, corrected finite-overlap autocorrelation bias and used the horizontal grid for time calibration; same cached GPT replies, no new cases or training."
-        lines.extend(["Initial run and analytic correction:", "",
-                      f"- First run: GPT HR MAE **{initial_metrics['gpt_paired_hr_mae_bpm']:.3f} bpm**, "
-                      f"pipeline **{initial_metrics['pipeline_paired_hr_mae_bpm']:.3f} bpm**; GPT had lower error.",
+        initial_gpt = initial_metrics.get("gpt_paired_hr_mae_bpm")
+        initial_pipeline = initial_metrics.get("pipeline_paired_hr_mae_bpm")
+        initial_gpt_text = f"{initial_gpt:.3f} bpm" if initial_gpt is not None else "not available"
+        initial_pipeline_text = f"{initial_pipeline:.3f} bpm" if initial_pipeline is not None else "not available"
+        lines.extend(["Initial run audit:", "",
+                      f"- First run: GPT HR MAE **{initial_gpt_text}**, pipeline **{initial_pipeline_text}**.",
+                      "- Missing initial estimates are recorded as unavailable; no score or advantage is imputed.",
                       "- The initial result is preserved in [comparison-initial.md](comparison-initial.md) and its JSON.",
+                      ""])
+        if initial_gpt is not None and initial_pipeline is not None:
+            summary["revision_note"] = "After the first run, corrected finite-overlap autocorrelation bias and used the horizontal grid for time calibration; same cached GPT replies, no new cases or training."
+            initial_winner = "GPT had lower error." if initial_gpt < initial_pipeline else "Pipeline had lower error." if initial_pipeline < initial_gpt else "Errors were tied."
+            lines.extend([f"- Initial paired result: {initial_winner}",
                       "- A consistent calibration bias led to an analytic correction: normalize autocorrelation by",
                       "  overlapping sample count and derive time calibration from the horizontal grid rather than",
                       "  averaging it with the shorter vertical projection. No learned parameters or patient training.",
                       "- Revised pipeline results reuse the original GPT predictions for byte-identical PNGs.",
                       "  This is post-correction engineering validation on the same cases, not a held-out clinical study.", ""])
+        else:
+            summary["revision_note"] = "Initial paired HR scores were unavailable; no initial advantage or missing score is inferred."
     failed = [row for row in rows if row["gpt"].get("error")]
     if failed:
         lines.extend(["Provider / skip notes:", ""])
@@ -231,7 +241,7 @@ def run_comparison(output_dir: Path = cfg.RESULTS_DIR, *, offline: bool = False,
         cached = cache.get(specification["id"])
         if cached and cached.get("image_sha256") == image_hash and cached["gpt"]["status"] in ("ok", "no_estimate"):
             gpt = {**cached["gpt"], "cached": True,
-                   "source_protocol_fingerprint": cached["gpt"].get("source_protocol_fingerprint", cached_protocol)}
+                   "source_protocol_fingerprint": cached["gpt"].get("source_protocol_fingerprint") or cached_protocol or "unknown_legacy"}
         elif offline or failures >= cfg.COMPARISON_MAX_CONSECUTIVE_FAILURES or time.monotonic() - started > max_seconds - cfg.COMPARISON_TIMEOUT_SECONDS:
             reason = "API not run (--offline)." if offline else "API calls stopped after consecutive failures or time budget; no result fabricated."
             gpt = {"status": "not_run", "heart_rate_bpm": None, "rhythm": "unknown", "error": reason}

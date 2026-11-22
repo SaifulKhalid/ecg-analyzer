@@ -3,7 +3,8 @@
 Educational screening tool, not a medical device.
 
 Start: **2026-11-22 08:33:48 UTC / 14:33:48 Asia/Dhaka**.
-Hard stop: **2026-11-22 13:33:48 UTC / 19:33:48 Asia/Dhaka** (300 minutes).
+Original hard stop: **2026-11-22 13:33:48 UTC / 19:33:48 Asia/Dhaka** (300 minutes).
+Extended by the user's explicit extra two hours: **2026-11-22 15:33:48 UTC / 21:33:48 Asia/Dhaka** (420 minutes total).
 Time boxes are ceilings: advance as soon as a phase is complete. If a phase
 exceeds its box by 20%, use its fallback, document it, and advance. No individual
 problem gets more than 10 uninterrupted minutes; change approach or seek the
@@ -21,6 +22,11 @@ permitted helper second opinion.
 | 7 Fresh synthetic validation | 15 min | Complete | 11 min | 10/10 fresh GPT replies; frozen DSP HR MAE 0.01551 vs 0.19436 bpm |
 | 8 Optional provider compatibility | 15 min | Complete | 16.3 min | Strict / opt-in tests, real five-section API response, default-off UI and provenance pass |
 | 9 Continuation wrap | 5 min | Complete | 3.7 min | 67 Python + 30 Node tests, build / UI / audits pass; original results preserved |
+| 10 Final reporting audit | 5 min | Complete | 4.6 min development | Legacy / missing initial metadata fixed; 69 tests pass; final log retrieval passed original deadline |
+| 11 Longer MIT-BIH validation | 25 min | In progress | 0 | Frozen DSP, full cached lead-0 records, seam-aware windows and honest metrics |
+| 12 Explanation grounding | 30 min | Pending | 0 | Reject unsupported numeric claims; measured JSON only; mocked tests |
+| 13 Documentation / live QA | 20 min | Pending | 0 | Preserve original results, document wider validation / grounding, check UI / API |
+| 14 Extended wrap | 5 min | Pending | 0 | Final tests, commits and audits before 15:33:48 UTC |
 
 ## Recon and assumptions
 
@@ -259,3 +265,19 @@ temperature 0.2, so explanation can remain null while measured results work.
   original GPT replies after client-only changes, with source protocol provenance.
   No further model calls / dataset training / DSP tuning. Commit final checkpoint
   before the original **13:33:48 UTC** hard stop.
+- 13:27:03 UTC — User requested continue again; only 6 min 45 s remain before
+  the original hard stop. Select a bounded reporting audit; no new data / model
+  calls or changes to the frozen measurement modules.
+- 13:28:40 UTC — Reproduced a report crash when legacy null protocol hashes mix
+  with current string hashes. Also identified initial-GPT-unavailable snapshots
+  being formatted as numeric scores. Fix explicit unknown / unavailable metadata
+  and avoid claiming a winner when initial paired estimates do not exist.
+- Reporting audit fixes completed before the original deadline: legacy null
+  hashes are explicitly unknown, and missing initial GPT scores remain unavailable
+  with no invented winner. Ten targeted tests passed; the full 69-test Python
+  suite also passed. Final log retrieval / bookkeeping passed the original hard
+  stop; stopped new development at that boundary pending further authorization.
+- User explicitly granted an additional two hours: extend the original deadline
+  to **15:33:48 UTC**, rather than silently resetting time. Commit the completed
+  audit, then validate more cached MIT-BIH signal and strengthen explanation
+  numeric grounding. No dataset training or changes to frozen measurement logic.

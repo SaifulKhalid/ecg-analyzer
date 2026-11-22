@@ -100,7 +100,7 @@ def run(output_dir: Path, *, offline: bool = False, max_seconds: float = 750) ->
         cached = cache.get(case["case_id"])
         if cached and cached["image_sha256"] == image_hash and cached["gpt"]["status"] in ("ok", "no_estimate"):
             gpt = {**cached["gpt"], "cached": True,
-                   "source_protocol_fingerprint": cached["gpt"].get("source_protocol_fingerprint", cached_protocol)}
+                   "source_protocol_fingerprint": cached["gpt"].get("source_protocol_fingerprint") or cached_protocol or "unknown_legacy"}
         elif offline or failures >= 3 or time.monotonic() - started > max_seconds - cfg.COMPARISON_TIMEOUT_SECONDS:
             gpt = {"status": "not_run", "heart_rate_bpm": None, "rhythm": "unknown",
                    "error": "Not run: offline, consecutive provider failures or study time budget."}
