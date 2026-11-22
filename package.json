@@ -1,0 +1,23 @@
+{
+  "name": "ecg-analyzer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A simple ECG image analyzer using Agentrouter.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test",
+    "build": "cf build",
+    "dev:worker": "cf dev",
+    "deploy": "cf deploy"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^2.0.0-rc.3",
+    "cf": "^1.0.0-rc.2",
+    "vite": "^8.3.8"
+  }
+}

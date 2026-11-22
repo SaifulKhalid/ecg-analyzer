@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Upload and preview an ECG image, then request an AI interpretation.">
+  <title>ECG Analyzer</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" type="module"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>ECG Analyzer</h1>
+      <p>Upload an ECG image to get an AI interpretation.</p>
+    </header>
+
+    <section class="upload-section" aria-labelledby="upload-heading">
+      <h2 id="upload-heading">Upload ECG</h2>
+      <label for="image-input">Choose an image</label>
+      <input id="image-input" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="file-help">
+      <p id="file-help" class="help">PNG, JPG, or WebP. Maximum file size: 10 MB.</p>
+
+      <div id="preview-section" hidden>
+        <div class="preview-heading">
+          <h3>Image preview</h3>
+          <button id="remove-button" type="button" class="text-button">Remove</button>
+        </div>
+        <div class="preview-frame">
+          <img id="preview" alt="Preview of the uploaded ECG">
+        </div>
+        <p id="file-name" class="help file-name"></p>
+        <button id="analyze-button" type="button" class="analyze-button">Analyze ECG</button>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite" hidden></p>
+      <p id="error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section id="result-section" class="result-section" aria-labelledby="result-heading" aria-busy="false" hidden>
+      <h2 id="result-heading" tabindex="-1">Analysis result</h2>
+      <p id="analysis-time" class="help"></p>
+      <div id="result" class="result"></div>
+    </section>
+
+    <footer>
+      <p>AI interpretation can be inaccurate.</p>
+    </footer>
+  </main>
+</body>
+</html>
