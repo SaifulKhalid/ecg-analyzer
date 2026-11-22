@@ -22,6 +22,7 @@ class SignalRequest(BaseModel):
     samples: list[float] | None = None
     sample_id: str | None = None
     explain: bool = True
+    allow_provider_default_temperature: bool = False
     notch_hz: Literal[50, 60] | None = cfg.NOTCH_HZ
 
     @model_validator(mode="after")
@@ -52,7 +53,8 @@ def analyze_signal_endpoint(body: SignalRequest) -> dict:
     try:
         signal = load_sample(body.sample_id) if body.sample_id is not None else Signal(
             np.asarray(body.samples, dtype=float), float(body.fs), {"source": "uploaded signal"})
-        return analyze_signal(signal, explain=body.explain, notch_hz=body.notch_hz)
+        return analyze_signal(signal, explain=body.explain, notch_hz=body.notch_hz,
+                              allow_provider_default_temperature=body.allow_provider_default_temperature)
     except (ValueError, OSError) as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -61,13 +63,15 @@ def analyze_signal_endpoint(body: SignalRequest) -> dict:
 def analyze_image_endpoint(image: UploadFile = File(...), pixels_per_mm: float | None = Form(None),
                            paper_speed: float = Form(cfg.PAPER_SPEED_MM_S), gain: float = Form(cfg.GAIN_MM_MV),
                            crop_box: str | None = Form(None), explain: bool = Form(True),
+                           allow_provider_default_temperature: bool = Form(False),
                            notch_hz: int = Form(int(cfg.NOTCH_HZ))) -> dict:
     try:
         bounds = json.loads(crop_box) if crop_box else None
         image_bytes = image.file.read(cfg.MAX_IMAGE_BYTES + 1)
         recovered = digitize(image_bytes, pixels_per_mm=pixels_per_mm, paper_speed=paper_speed,
                              gain=gain, crop_box=bounds)
-        result = analyze_signal(recovered.signal, explain=explain, notch_hz=notch_hz)
+        result = analyze_signal(recovered.signal, explain=explain, notch_hz=notch_hz,
+                                allow_provider_default_temperature=allow_provider_default_temperature)
         result["plots"]["digitization"] = base64.b64encode(recovered.debug_overlay).decode("ascii")
         return result
     except (ValueError, OSError, TypeError) as error:

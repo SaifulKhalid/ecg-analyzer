@@ -74,7 +74,7 @@ export default {
           const imageBytes = Uint8Array.from(atob(encoded), character => character.charCodeAt(0));
           body = new FormData();
           body.set('image', new Blob([imageBytes], { type: mime }), 'ecg-strip');
-          for (const field of ['pixels_per_mm', 'paper_speed', 'gain', 'crop_box', 'explain', 'notch_hz']) {
+          for (const field of ['pixels_per_mm', 'paper_speed', 'gain', 'crop_box', 'explain', 'notch_hz', 'allow_provider_default_temperature']) {
             if (upload[field] !== undefined) body.set(field, typeof upload[field] === 'object' ? JSON.stringify(upload[field]) : String(upload[field]));
           }
         } else if ((route[1] === '/analyze' && contentType.startsWith('multipart/form-data'))

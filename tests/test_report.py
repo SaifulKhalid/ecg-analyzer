@@ -41,3 +41,23 @@ def test_insufficient_quality_never_starts_bridge(monkeypatch):
     payload = measured_payload()
     payload["quality"]["status"] = "insufficient_quality"
     assert report.explain_measurements(payload)["explanation"] is None
+
+
+def test_temperature_compatibility_is_explicit_and_keeps_image_out_of_bridge(monkeypatch):
+    seen = []
+    settings = {"requested_temperature": 0.2, "effective_temperature": "provider_default",
+                "used_provider_default": True, "compatibility_requested": True}
+
+    def fake_bridge(request):
+        seen.append(request)
+        return {"status_code": 200, "report": {"explanation": {"Summary": "Possible regular timing."}},
+                "explanation_settings": settings}
+
+    monkeypatch.delenv("ECG_LLM_ENABLED", raising=False)
+    monkeypatch.setattr(report, "call_bridge", fake_bridge)
+    report.explain_measurements(measured_payload())
+    result = report.explain_measurements(measured_payload(), allow_provider_default_temperature=True)
+    assert seen[0]["allow_provider_default_temperature"] is False
+    assert seen[1]["allow_provider_default_temperature"] is True
+    assert "data:image" not in json.dumps(seen)
+    assert result["explanation_settings"] == settings

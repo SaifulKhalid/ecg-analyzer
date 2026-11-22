@@ -35,18 +35,20 @@ def call_bridge(request: dict, timeout_seconds: float = cfg.LLM_TOTAL_TIMEOUT_SE
         return {"error": "AgentRouter is unavailable; measured results are preserved.", "status_code": 502}
 
 
-def explain_measurements(payload: dict) -> dict:
+def explain_measurements(payload: dict, *, allow_provider_default_temperature: bool = False) -> dict:
     """Production entry: whitelist measured JSON only; quality failures skip LLM."""
     if payload.get("quality", {}).get("status") != "ok":
         return {"explanation": None, "error": "Explanation skipped because signal quality is insufficient."}
     if os.environ.get("ECG_LLM_ENABLED", "1").lower() in ("0", "false", "off"):
         return {"explanation": None, "error": "AI explanation disabled; measured results are available."}
     measured = {key: payload[key] for key in ("measurements", "findings", "quality", "warnings") if key in payload}
-    result = call_bridge({"kind": "explain", "payload": measured})
+    result = call_bridge({"kind": "explain", "payload": measured,
+                          "allow_provider_default_temperature": allow_provider_default_temperature})
     if result.get("status_code") != 200:
         return {"explanation": None, "error": result.get("error", "AgentRouter explanation failed.")}
     explanation = result.get("report", {}).get("explanation")
     if not isinstance(explanation, dict):
         return {"explanation": None, "error": "AgentRouter returned an invalid explanation."}
     return {"explanation": explanation, "error": None, "model": result.get("model"),
+            "explanation_settings": result.get("explanation_settings"),
             "attempts": result.get("attempts"), "duration_ms": result.get("durationMs")}

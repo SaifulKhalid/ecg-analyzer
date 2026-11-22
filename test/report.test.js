@@ -41,6 +41,50 @@ test('an explanation must contain all five requested sections', async () => {
   assert.equal(response.status, 502);
 });
 
+test('strict policy never removes temperature after an unsupported-parameter response', async () => {
+  const temperatures = [];
+  const response = await explainMeasurements(payload, 'key', async (url, options) => {
+    temperatures.push(JSON.parse(options.body).temperature);
+    return Response.json({ error: { code: 'unsupported_parameter', param: 'temperature',
+      message: "Unsupported parameter: 'temperature' is not supported with this model." } }, { status: 400 });
+  });
+  assert.equal(response.status, 502);
+  assert.deepEqual(temperatures, [0.2, 0.2]);
+});
+
+test('explicit compatibility retries the identical measured JSON once and reports provider default', async () => {
+  const requests = [];
+  const response = await explainMeasurements(payload, 'key', async (url, options) => {
+    const body = JSON.parse(options.body);
+    requests.push(body);
+    if (requests.length === 1) return Response.json({ error: { code: 'unsupported_parameter', param: 'temperature',
+      message: "Unsupported parameter: 'temperature' is not supported with this model." } }, { status: 400 });
+    return provider({ explanation });
+  }, undefined, { allowProviderDefaultTemperature: true });
+  assert.equal(response.status, 200);
+  assert.equal(requests.length, 2);
+  assert.equal(requests[0].temperature, 0.2);
+  assert.equal(requests[1].temperature, undefined);
+  assert.deepEqual(requests[0].input, requests[1].input);
+  assert.doesNotMatch(JSON.stringify(requests), /input_image|image_url|data:image/);
+  const result = await response.json();
+  assert.equal(result.attempts, 2);
+  assert.equal(result.explanation_settings.requested_temperature, 0.2);
+  assert.equal(result.explanation_settings.effective_temperature, 'provider_default');
+  assert.equal(result.explanation_settings.used_provider_default, true);
+});
+
+test('compatibility does not remove temperature for unrelated provider errors', async () => {
+  const requests = [];
+  const response = await explainMeasurements(payload, 'key', async (url, options) => {
+    requests.push(JSON.parse(options.body));
+    return Response.json({ error: { message: 'Service temporarily unavailable.' } }, { status: 503 });
+  }, undefined, { allowProviderDefaultTemperature: true });
+  assert.equal(response.status, 502);
+  assert.equal(requests.length, 2);
+  assert.ok(requests.every(body => body.temperature === 0.2));
+});
+
 test('benchmark image-only mode is explicit and has a compact HR/rhythm contract', async () => {
   const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZ1sAAAAASUVORK5CYII=';
   const response = await estimateImageBaseline(image, 'key', async (url, options) => {

@@ -76,10 +76,15 @@ Node also reads an optional `.env`; [.env.example](.env.example) contains no key
 Environment variables take precedence. Models default to `gpt-5.6-sol` and
 `gpt-6.1-sol`; `AGENTROUTER_MODEL` / `AGENTROUTER_FALLBACK_MODEL` are optional overrides.
 
-**Current provider limitation:** both available AgentRouter models reject the
-required explanation temperature 0.2. The app preserves that setting and
-returns `explanation: null` with an error note. DSP, demos and plots remain
-available. The benchmark uses the original image-client model default temperature.
+**Temperature policy:** strict temperature 0.2 remains the default. Both current
+AgentRouter models reject it, so strict mode returns `explanation: null` with an
+error note. Enable **Allow provider default if temperature 0.2 is unsupported**
+to explicitly request compatibility mode. Only an unsupported-temperature error
+triggers one retry of the same measured JSON with the same model / key at the
+provider default. The response includes `explanation_settings`, and the UI shows
+when compatibility was used. Other errors retain normal fallback / error handling.
+Live five-section explanation evidence: [llm-compatibility.json](results/llm-compatibility.json).
+The image-only benchmark continues to use the model default temperature.
 
 ## Validate and compare
 
@@ -139,6 +144,25 @@ This is post-correction engineering validation, not a held-out clinical study.
 
 See [comparison.md](results/comparison.md), [comparison.json](results/comparison.json),
 and the preserved [initial result](results/comparison-initial.md).
+
+An additional fresh synthetic study committed its case manifest before GPT
+requests and froze all measurement modules. HRs were uniformly sampled from
+45–130 bpm with unused seeds, noise, two irregular and two inverted strips.
+All ten cases are reported, with no post-result DSP changes:
+
+| Fresh validation, frozen DSP | GPT-only | Measured pipeline |
+| --- | ---: | ---: |
+| HR mean absolute error | 0.19436 bpm | **0.01551 bpm** |
+| Predictions available / HR within ±3 bpm | 10/10 | 10/10 |
+| Regular / irregular RR timing accuracy | 100% | 100% |
+
+HR MAE is **92.0% lower** on these fresh images. This is independent synthetic
+parameter validation, with a small absolute difference; clinical accuracy remains
+unproven. See [protocol](results/holdout/manifest.json) and
+[fresh validation results](results/holdout/comparison.md). Reproduce with
+`python scripts/compare_holdout.py --offline`; the committed manifest and
+measurement-code fingerprint prevent silently changing the study.
+
 [UI verification](results/ui-verification.md) records actual desktop/mobile demos
 and multipart image uploads. [PROGRESS.md](PROGRESS.md) records phases and assumptions.
 
@@ -147,9 +171,11 @@ and multipart image uploads. [PROGRESS.md](PROGRESS.md) records phases and assum
 - `GET /health`: service status, version and target sampling rate.
 - `GET /samples`: demo IDs and descriptions.
 - `POST /analyze-signal`: `{ "fs": 250, "samples": [...] }` in **mV**, or
-  `{ "sample_id": "mitdb-100" }`. Optional `explain: false`, `notch_hz: 50/60/null`.
+  `{ "sample_id": "mitdb-100" }`. Optional `explain: false`, `notch_hz: 50/60/null`,
+  `allow_provider_default_temperature: true` for explicit compatibility.
 - `POST /analyze`: multipart `image` with optional `pixels_per_mm`, `paper_speed`,
-  `gain`, `crop_box`, `explain`, `notch_hz`. Crop bounds: `[left, top, right, bottom]`.
+  `gain`, `crop_box`, `explain`, `notch_hz`, `allow_provider_default_temperature`.
+  Crop bounds: `[left, top, right, bottom]`.
 
 Responses contain `status`, `quality`, `measurements`, `findings`, `explanation`,
 `plots` (base64 PNGs), and `warnings`. Poor quality skips rules and GPT.
@@ -178,7 +204,7 @@ curl.exe -F "image=@strip.png" -F "explain=false" http://127.0.0.1:8765/analyze
 - SNR measures beat-template repeatability; varying morphology can lower it.
   Confidence badges are heuristic, not validated disease probabilities. RR
   irregularity alone cannot establish AFib.
-- Five short MIT-BIH segments and ten Gaussian-sum images are limited engineering
+- Five short MIT-BIH segments and twenty Gaussian-sum images are limited engineering
   evidence. Clinical screening accuracy and photograph accuracy remain unproven.
 - Future work: validated PR/QT/ST delineation; a separate CNN study on PTB-XL;
   AD8232 hardware integration through `/analyze-signal` with mV conversion and

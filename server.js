@@ -91,7 +91,7 @@ export function createApp({ fetchImpl = fetch, dspUrl = process.env.ECG_API_URL 
             const mime = metadata.slice(5).split(';')[0];
             body = new FormData();
             body.set('image', new Blob([Buffer.from(base64, 'base64')], { type: mime }), 'ecg-strip');
-            for (const field of ['pixels_per_mm', 'paper_speed', 'gain', 'crop_box', 'explain', 'notch_hz']) {
+            for (const field of ['pixels_per_mm', 'paper_speed', 'gain', 'crop_box', 'explain', 'notch_hz', 'allow_provider_default_temperature']) {
               if (upload[field] !== undefined) body.set(field, typeof upload[field] === 'object' ? JSON.stringify(upload[field]) : String(upload[field]));
             }
           } else if ((route[1] === '/analyze' && contentType.startsWith('multipart/form-data'))

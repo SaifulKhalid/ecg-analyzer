@@ -42,6 +42,27 @@ def test_quality_failure_and_opt_out_never_call_llm(api_client):
     assert calls == []
 
 
+def test_temperature_policy_is_opt_in_and_visible_in_response(api_client, monkeypatch):
+    from ecg import report
+
+    request, _ = api_client
+    modes = []
+
+    def fake(payload, *, allow_provider_default_temperature=False):
+        modes.append(allow_provider_default_temperature)
+        return {"explanation": {"Summary": "Possible measured timing."}, "error": None,
+                "explanation_settings": {"requested_temperature": 0.2,
+                    "effective_temperature": "provider_default" if allow_provider_default_temperature else 0.2,
+                    "used_provider_default": allow_provider_default_temperature}}
+
+    monkeypatch.setattr(report, "explain_measurements", fake)
+    assert request("/analyze-signal", {"sample_id": "synth-regular"})[0] == 200
+    code, result = request("/analyze-signal", {"sample_id": "synth-regular", "allow_provider_default_temperature": True})
+    assert code == 200 and modes == [False, True]
+    assert result["explanation_settings"]["used_provider_default"]
+    assert any("provider's default temperature" in warning for warning in result["warnings"])
+
+
 @pytest.mark.parametrize("body", [{}, {"sample_id": "../../config.local.js"},
                                   {"samples": [1, 2, 3], "fs": 250},
                                   {"samples": [1] * 500, "fs": 1},

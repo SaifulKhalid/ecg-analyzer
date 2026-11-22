@@ -12,6 +12,7 @@ try {
   const signal = AbortSignal.timeout(timeoutMs);
   const options = { primaryModel: config.primaryModel, fallbackModel: config.fallbackModel,
     temperature: request.temperature ?? 0.2,
+    allowProviderDefaultTemperature: request.allow_provider_default_temperature === true,
     attemptTimeoutMs: Math.min(timeoutMs, Number(request.attempt_timeout_seconds || 35) * 1000) };
   const response = request.kind === 'baseline'
     ? await estimateImageBaseline(request.image, config.apiKeys, fetch, signal, options)

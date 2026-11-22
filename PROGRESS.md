@@ -19,8 +19,8 @@ permitted helper second opinion.
 | 5 GPT comparison | 25 min | Complete | 20.3 min | 10 paired real GPT replies; HR MAE 0.00823 vs 0.02047; categorical accuracy ties at 100% |
 | 6 Wrap + checks | 5 min | Complete | 4.3 min | 62 Python + 27 Node tests; build / live UI / data-secret audit pass; README complete |
 | 7 Fresh synthetic validation | 15 min | Complete | 11 min | 10/10 fresh GPT replies; frozen DSP HR MAE 0.01551 vs 0.19436 bpm |
-| 8 Optional provider compatibility | 15 min | In progress | 0 | Start 13:01 UTC; strict temperature 0.2 remains default, explicit opt-in only |
-| 9 Continuation wrap | 5 min | Pending | 0 | Checks, docs / results and final commits before 13:33:48 UTC |
+| 8 Optional provider compatibility | 15 min | Complete | 16.3 min | Strict / opt-in tests, real five-section API response, default-off UI and provenance pass |
+| 9 Continuation wrap | 5 min | In progress | 0 | Final checks and commits; original 13:33:48 UTC hard stop persists |
 
 ## Recon and assumptions
 
@@ -230,3 +230,19 @@ temperature 0.2, so explanation can remain null while measured results work.
   measurement code or case selection. This adds fresh synthetic evidence;
   clinical / photo accuracy still is not established. Added manifest immutability
   and changed-code rejection checks. Original comparison artifacts remain intact.
+- 13:06 UTC — Explicit compatibility mode returns a real five-section explanation
+  from gpt-5.6-sol. First request retains 0.2; only its explicit unsupported-param
+  response permits a same-JSON / same-key / same-model retry at provider default.
+  Strict mode never drops temperature. Response / UI disclose effective policy.
+  Tests cover strict, opt-in, unrelated failures, JSON-only input and API defaults.
+- 13:16 UTC — Actual Node -> FastAPI -> AgentRouter compatibility flow returns
+  all five sections; measured HR 72.009 bpm and provenance saved in
+  `results/llm-compatibility.json`. Browser checks cover the explicit flag,
+  default-off state, visible provenance and safe text rendering. Scoped agy CSS
+  polish timed out after 90 seconds without file changes; retained existing CSS
+  and verified layout ourselves. No measurement module changed.
+- 13:17 UTC — Phase 8 complete. Added measured-JSON-only compatibility to the
+  existing client / bridge / API / UI, preserving strict 0.2 defaults and quality
+  gating. Sixteen targeted Python tests and seven report-client tests pass.
+  Actual compatibility API response and fresh responsive verification are saved.
+  The 15-minute target ran slightly long (under the 20% scope-cut threshold).

@@ -13,6 +13,7 @@ const demoSelect = document.querySelector('#demo-select');
 const demoButton = document.querySelector('#demo-button');
 const demoReload = document.querySelector('#demo-reload');
 const explainEnabled = document.querySelector('#explain-enabled');
+const providerDefault = document.querySelector('#provider-default');
 const notchHz = document.querySelector('#notch-hz');
 
 let selectedImage = '';
@@ -171,6 +172,9 @@ function renderReport(data) {
 
   const explanation = element('div', 'report-explanation');
   explanation.append(element('h3', 'panel-heading', 'AI explanation of measured JSON'));
+  if (data.explanation_settings?.used_provider_default) {
+    explanation.append(element('p', 'provider-note', 'Compatibility mode used the provider default temperature after 0.2 was rejected. AI received the measured JSON only.'));
+  }
   if (data.explanation && typeof data.explanation === 'object') {
     for (const section of ['Summary', 'What the numbers mean', 'Possible findings', 'Limitations', 'When to see a doctor']) {
       if (!data.explanation[section]) continue;
@@ -296,13 +300,15 @@ analyzeButton.addEventListener('click', () => {
     body.set('crop_box', JSON.stringify(bounds));
   }
   body.set('explain', String(explainEnabled.checked));
+  body.set('allow_provider_default_temperature', String(providerDefault.checked));
   body.set('notch_hz', notchHz.value);
   runAnalysis('/analyze', body, analyzeButton);
 });
 
 demoButton.addEventListener('click', () => {
   if (!demoSelect.value || busy) return;
-  runAnalysis('/analyze-signal', { sample_id: demoSelect.value, explain: explainEnabled.checked, notch_hz: Number(notchHz.value) }, demoButton);
+  runAnalysis('/analyze-signal', { sample_id: demoSelect.value, explain: explainEnabled.checked,
+    allow_provider_default_temperature: providerDefault.checked, notch_hz: Number(notchHz.value) }, demoButton);
 });
 
 async function loadDemos() {
