@@ -193,7 +193,9 @@ function renderReport(data) {
   result.append(limitations);
   const json = element('details', 'json-panel');
   json.append(element('summary', '', 'Inspect measured JSON'));
-  json.append(element('pre', '', JSON.stringify({ quality: data.quality, measurements: data.measurements, findings: data.findings }, null, 2)));
+  json.append(element('pre', '', JSON.stringify({ quality: data.quality, measurements: data.measurements,
+    findings: data.findings, explanation_grounding: data.explanation_grounding,
+    explanation_settings: data.explanation_settings }, null, 2)));
   result.append(json, element('p', 'disclaimer', 'Educational screening tool, not a medical device.'));
 }
 

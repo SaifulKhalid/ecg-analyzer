@@ -25,8 +25,8 @@ permitted helper second opinion.
 | 10 Final reporting audit | 5 min | Complete | 4.6 min development | Legacy / missing initial metadata fixed; 69 tests pass; final log retrieval passed original deadline |
 | 11 Longer MIT-BIH validation | 25 min | Complete | 2.6 min | 150.46 minutes; macro sensitivity 99.47%, PPV 99.94%; 6 boundary tests pass |
 | 12 Explanation grounding | 30 min | Complete | 14 min resumed | Typed / labeled numbers, report-only definitions, mocked failures; live guarded five-section response |
-| 13 Documentation / live QA | 20 min | In progress | 0 | Preserve original results, document wider validation / grounding, check UI / API |
-| 14 Extended wrap | 5 min | Pending | 0 | Final tests, commits and audits before 15:33:48 UTC |
+| 13 Documentation / live QA | 20 min | Complete | 6.7 min | README / API provenance, 111 Python tests, build, actual desktop/mobile demos and upload, saved live reply rendering |
+| 14 Extended wrap | 5 min | In progress | 0 | Final Git / credential-data / frozen-code audits; latest Continue authorizes post-interruption completion |
 
 ## Recon and assumptions
 
@@ -93,6 +93,16 @@ permitted helper second opinion.
 - [x] `comparison.md` exists
 - [x] `pytest` passes
 - [x] README has architecture diagram + limitations
+
+## Extended checks
+
+- [x] Whole-record validation includes all five cached recordings / 150.46 minutes
+- [x] Original first-minute and both GPT comparison results preserved
+- [x] Measurement fingerprint still matches the predeclared fresh-study protocol
+- [x] Unsupported numeric / mislabeled / unavailable-measurement replies are rejected
+- [x] Actual measured-JSON-only live reply passes numeric checks and all five sections
+- [x] Browser replay uses matching fresh signal measurements/plots and displays grounding provenance
+- [x] Full 111-test Python suite and 30-test Node suite pass; Worker build passes
 
 ## Work log
 
@@ -214,7 +224,12 @@ permitted helper second opinion.
 | 6 | README, final progress / checklist, updated live UI verification | `af1c280` |
 | 7 | Predeclared fresh case manifest / script, frozen-module tests, fresh results | `b38df6f`, `1b392af` |
 | 8 | Explicit temperature compatibility in client / bridge / API / UI, tests and live explanation evidence | `eb60aec` |
-| 9 | Historical offline prediction preservation, final documentation and checks | Continuation wrap commit |
+| 9 | Historical offline prediction preservation, final documentation and checks | `44c42dd` |
+| 10 | Legacy-null / unavailable-initial reporting cases and tests | `4c12a76` |
+| 11 | `validate_long.py`, window-boundary tests, predeclared protocol and full-record results | `78ddc7c`, `0c1a9e1` |
+| 12 | `grounding.py`, `report.py`, API provenance / shared prompt, grounding tests, both live artifacts | `d06a289` |
+| 13 | README wider results / grounding limits, `app.js` JSON provenance, structured UI verification | Documentation / UI checkpoint |
+| 14 | Final progress, frozen-code / data-secret / Git audit | Extended wrap checkpoint |
 
 No dataset training; no threshold fitting to patient labels; no phase overrun.
 The paired HR improvement is very small in absolute bpm and follows an openly
@@ -318,3 +333,13 @@ temperature 0.2, so explanation can remain null while measured results work.
   after the final label refinements (four unrelated tests deselected); 30 Node
   tests passed. Frozen measurement fingerprint still matches the predeclared
   fresh-study protocol. Restore normal API startup before final browser checks.
+- 16:44:46 UTC — Phase 13 complete. Normal API startup restored (no private QA
+  observer in the running service). The first browser run exposed omitted
+  grounding metadata in the expandable JSON panel; add the field in `app.js`,
+  then the repeated desktop/mobile demo, image-upload and safe-rendering flow
+  passes. The saved actual reply is replayed against freshly measured identical
+  synthetic values and corresponding plots, with no extra model request.
+  Full pytest: **111 passed / 15.73 s**; 30 Node tests passed; Cloudflare build
+  passes under isolated Node 22.18. Nonfatal upstream PyParsing warnings remain.
+  README includes wider results, all unmatched-count limits, report definitions,
+  conservative grounding / written-number limits and unchanged clinical scope.

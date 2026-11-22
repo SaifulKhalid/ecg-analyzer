@@ -31,6 +31,8 @@ MIT-BIH / synthetic demo +-------------------------------> resample 250 Hz
                                                                |
                                                    shared AgentRouter client
                                                                |
+                                               numeric / metric / unit guard
+                                                               |
                                              explanation / null + error note
 
 Raw / filtered, spectrum, R events, RR tachogram -> existing Node frontend
@@ -86,6 +88,21 @@ when compatibility was used. Other errors retain normal fallback / error handlin
 Live five-section explanation evidence: [llm-compatibility.json](results/llm-compatibility.json).
 The image-only benchmark continues to use the model default temperature.
 
+**Explanation grounding:** a report-only copy of the measured JSON includes
+metric definitions and screening thresholds from `ecg/config.py`. These remain
+definitions, not observations. The report layer checks explicit numeric claims
+against compatible units and named metrics, allowing honest rounding and
+seconds/ms or fraction/percent conversions. Unsupported numbers, unavailable
+waveform measurements and definite-condition claims return `explanation: null`
+with an error note; the measured results remain available. The API exposes
+`explanation_grounding` with the check status and reason codes.
+
+Both synthetic live attempts are preserved: a
+[rejected reply's API response](results/grounding-rejected.json) and a
+[successful five-section reply](results/grounded-explanation.json) with 14 numeric
+checks passed. This conservative guard may reject unfamiliar wording; it does
+not prove all medical language is correct or check written-out numbers.
+
 ## Validate and compare
 
 ```powershell
@@ -93,6 +110,8 @@ The image-only benchmark continues to use the model default temperature.
 .\.venv\Scripts\python.exe scripts/download_data.py
 .\.venv\Scripts\python.exe scripts/validate.py
 .\.venv\Scripts\python.exe scripts/validate.py --images
+# Wider check against the committed whole-record protocol; preserves the first-minute table.
+.\.venv\Scripts\python.exe scripts/validate_long.py
 
 # Live GPT image-only calls, with checkpoints and bounded timeouts.
 .\.venv\Scripts\python.exe scripts/compare_gpt.py
@@ -126,6 +145,28 @@ and one-to-one matching within 150 ms. Each annotation and detection can match o
 The detector passes the requested gate: record 100 ≥99% sensitivity / PPV and
 both means ≥95%. One beat is missed in record 201. Counts and timing errors:
 [validation.md](results/validation.md), [validation.json](results/validation.json).
+
+The unchanged detector was also checked on all five complete lead-0 recordings.
+The protocol and file hashes were committed before evaluation. Processing uses
+290-second central intervals plus five seconds of context on each side, retaining
+events only in half-open central intervals to avoid double counting at seams:
+
+| Complete record | Reference beats | Sensitivity | PPV |
+| --- | ---: | ---: | ---: |
+| 100 | 2,273 | 100.00% | 100.00% |
+| 101 | 1,865 | 99.95% | 99.79% |
+| 106 | 2,027 | 99.75% | 99.95% |
+| 119 | 1,987 | 100.00% | 99.95% |
+| 201 | 1,963 | 97.66% | 100.00% |
+| **Macro mean** | **10,115 total** | **99.47%** | **99.94%** |
+
+Coverage: **150.46 minutes**; pooled counts **10,063 TP / 6 FP / 52 FN**.
+Pooled sensitivity is **99.49%**, PPV **99.94%**. Every missed/extra event is
+recorded in [long-validation.json](results/long-validation.json); see the
+[full table](results/long-validation.md) and
+[predeclared protocol](results/long-validation-protocol.json). No detector tuning
+followed this run. These are the same five selected records, not an independent
+patient holdout; the check validates raw-signal R detection, not disease screening.
 
 Fourteen calibrated image round trips also pass the ≤3 bpm gate, including
 MIT-BIH 100, inversion, irregular timing, fractional grid spacing and calibration
@@ -183,6 +224,9 @@ and multipart image uploads. [PROGRESS.md](PROGRESS.md) records phases and assum
 
 Responses contain `status`, `quality`, `measurements`, `findings`, `explanation`,
 `plots` (base64 PNGs), and `warnings`. Poor quality skips rules and GPT.
+When GPT is called successfully, `explanation_grounding` records whether its
+numbers passed the report checks. A rejected explanation keeps signal status
+and measurements intact and supplies `explanation_error`.
 Source limits: 2–300 seconds, raw signal fs 80–2000 Hz, images under 10 MB.
 Node also supports `/api/` aliases; the old JSON image upload contract now
 converts to multipart and passes through the digitizer.
@@ -208,8 +252,12 @@ curl.exe -F "image=@strip.png" -F "explain=false" http://127.0.0.1:8765/analyze
 - SNR measures beat-template repeatability; varying morphology can lower it.
   Confidence badges are heuristic, not validated disease probabilities. RR
   irregularity alone cannot establish AFib.
-- Five short MIT-BIH segments and twenty Gaussian-sum images are limited engineering
-  evidence. Clinical screening accuracy and photograph accuracy remain unproven.
+- Five MIT-BIH recordings (150.46 minutes) and twenty Gaussian-sum comparison
+  images are limited engineering evidence. Clinical screening accuracy and
+  photograph accuracy remain unproven; no independent patient holdout was used.
+- Explanation numbers are checked conservatively; written-out numbers and
+  arbitrary medical prose are outside that check's scope. Clinician review
+  remains necessary even when the numeric check passes.
 - Future work: validated PR/QT/ST delineation; a separate CNN study on PTB-XL;
   AD8232 hardware integration through `/analyze-signal` with mV conversion and
   appropriate handling of streaming/filter boundaries.
