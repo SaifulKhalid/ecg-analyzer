@@ -10,6 +10,8 @@ export default defineConfig({
       ASSETS: bindings.assets(),
       AGENTROUTER_API_KEY: bindings.secret(),
       AGENTROUTER_API_KEY_2: bindings.secret(),
+      // Supply a reachable FastAPI URL when building / deploying the measured UI.
+      ECG_API_URL: bindings.text(process.env.ECG_API_URL || ''),
     },
     assets: {
       runWorkerFirst: true,

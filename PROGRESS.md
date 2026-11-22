@@ -12,9 +12,9 @@ permitted helper second opinion.
 | Phase | Budget | Status | Time spent | Evidence / fallback |
 | --- | ---: | --- | ---: | --- |
 | 0 Recon + skeleton | 15 min | Complete | 13.4 min | Baseline + skeleton; pinned environment; all five MIT-BIH records cached |
-| 1 Core DSP + gate | 75 min | Complete | 4.0 min | Record 100: 100% / 100%; means: 99.78% / 100%; 20 DSP tests pass |
-| 2 Rules + LLM + API | 45 min | In progress | 0 | Start 08:51 UTC; reuse client through measured-JSON bridge |
-| 3 UI + plots | 60 min | Pending | 0 | Preserve existing white/blue styling and add demo/results panel |
+| 1 Core DSP + gate | 75 min | Complete | 3.3 min | Record 100: 100% / 100%; means: 99.78% / 100%; 20 DSP tests pass |
+| 2 Rules + LLM + API | 45 min | Complete | 12.5 min | 38 Python + 27 Node tests pass; signal API works; provider rejects required temperature |
+| 3 UI + plots | 60 min | In progress | 0 | Start 09:03 UTC; preserve existing styling, add demo/results panel |
 | 4 Image digitizer | 75 min | Pending | 0 | If auto grid fails, require explicit pixels/mm; single-lead only |
 | 5 GPT comparison | 25 min | Pending | 0 | Unavailable GPT calls must be marked not run, never fabricated |
 | 6 Wrap + checks | 5 min | Pending | 0 | Full pytest + existing Node tests, reproducible README |
@@ -55,14 +55,20 @@ permitted helper second opinion.
   `constraints.txt` pins its existing transitive dependency to pandas 2.2.3.
 - Existing image-only path is a legacy baseline; the finished UI must use only
   measured endpoints. Cloudflare needs an external reachable DSP service.
+- Live AgentRouter catalog exposes only `gpt-5.6-sol` and `gpt-6.1-sol`. Both
+  reject the required `temperature: 0.2`, including a short compatibility probe
+  with reasoning disabled. Keep the requested temperature and return null
+  explanation plus provider error; do not silently change it. The image-only
+  comparison has no mandated temperature and uses the original model default.
+- Plot response slot is implemented; actual figures are the phase 3 task.
 
 ## Definition of done
 
 - [x] `validate.py` table exists with real numbers
 - [ ] Demo dropdown works end to end
-- [ ] `/analyze-signal` works
+- [x] `/analyze-signal` works
 - [ ] `/analyze` works on a rendered grid image
-- [ ] Production GPT gets measured JSON only
+- [x] Production GPT gets measured JSON only
 - [ ] `comparison.md` exists
 - [ ] `pytest` passes
 - [ ] README has architecture diagram + limitations
@@ -88,3 +94,13 @@ permitted helper second opinion.
   20 tests pass (polarity, rates 45–130, hum / drift, resampling, feature formulas,
   double-count prevention and invalid / flat inputs). Fixed cp1252 console
   printing; no detector tuning is needed. Commit phase 1, then start phase 2.
+- 08:50:30 UTC — Phase 1 committed; phase 2 started early after the gate passed.
+- 09:02 UTC — Added rate / RR evidence rules, beat-repeatability SNR / quality
+  gate, FastAPI signal and demo endpoints, and private stdin/stdout Node bridge
+  to the existing AgentRouter client. Production Node and Worker routes proxy
+  all images to DSP; even the old JSON image contract now digitizes first.
+  Image-only GPT is retained solely as an explicit benchmark CLI entry point.
+  Boundary tests verify no image / plots / raw samples reach the explainer.
+  All 9 demos pass quality; 38 Python tests and 27 Node tests pass. Live call
+  demonstrates graceful provider failure at the requested temperature. No
+  phase overrun or fallback needed beyond the explicitly allowed null explanation.
