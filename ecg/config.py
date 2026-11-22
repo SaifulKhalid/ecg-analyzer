@@ -119,6 +119,21 @@ COMPARISON_TIMEOUT_SECONDS = 75.0
 COMPARISON_PAUSE_SECONDS = 1.0
 COMPARISON_DURATION_SECONDS = 12.0
 COMPARISON_SEED = 20261122
+COMPARISON_MAX_SECONDS = 23 * 60
+COMPARISON_MAX_CONSECUTIVE_FAILURES = 3
+# Freeze these cases before requesting any GPT predictions. No cherry-picking.
+COMPARISON_CASES = (
+    {"id": "regular_45", "hr": 45, "noise": 0.005},
+    {"id": "regular_58", "hr": 58, "noise": 0.008},
+    {"id": "regular_65", "hr": 65, "noise": 0.010, "baseline_wander": 0.05},
+    {"id": "regular_72", "hr": 72, "noise": 0.015, "mains_amplitude": 0.08, "baseline_wander": 0.15},
+    {"id": "regular_90", "hr": 90, "noise": 0.020, "mains_amplitude": 0.10, "baseline_wander": 0.20},
+    {"id": "noisy_105", "hr": 105, "noise": 0.060, "mains_amplitude": 0.15, "baseline_wander": 0.15},
+    {"id": "noisy_130", "hr": 130, "noise": 0.050, "mains_amplitude": 0.15, "baseline_wander": 0.15},
+    {"id": "irregular_75", "hr": 75, "noise": 0.015, "mains_amplitude": 0.08, "baseline_wander": 0.12, "irregular": True},
+    {"id": "irregular_110", "hr": 110, "noise": 0.035, "mains_amplitude": 0.10, "baseline_wander": 0.10, "irregular": True},
+    {"id": "noisy_85", "hr": 85, "noise": 0.100, "mains_amplitude": 0.20, "baseline_wander": 0.30},
+)
 
 SYNTH_DEFAULT_HR = 72.0
 SYNTH_DEFAULT_NOISE = 0.02

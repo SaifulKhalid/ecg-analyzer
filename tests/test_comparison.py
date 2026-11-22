@@ -1,0 +1,74 @@
+import base64
+
+import pytest
+
+from scripts import compare_gpt
+
+
+def row(truth, gpt, pipeline, *, gpt_status="ok", true_rhythm="regular", gpt_rhythm="regular"):
+    return {"truth": {"heart_rate_bpm": truth, "rhythm": true_rhythm},
+            "gpt": {"status": gpt_status, "heart_rate_bpm": gpt, "rhythm": gpt_rhythm},
+            "pipeline": {"status": "ok", "heart_rate_bpm": pipeline, "rhythm": true_rhythm}}
+
+
+def test_paired_error_comparison_uses_same_cases_and_reports_missing_coverage():
+    metrics = compare_gpt.comparison_metrics([row(60, 70, 60.2), row(100, None, 100.2, gpt_status="failed", gpt_rhythm="unknown")])
+    assert metrics["paired_count"] == 1
+    assert metrics["gpt_hr_coverage"] == 1 and metrics["pipeline_hr_coverage"] == 2
+    assert metrics["gpt_paired_hr_mae_bpm"] == 10
+    assert metrics["pipeline_paired_hr_mae_bpm"] == pytest.approx(0.2)
+    assert metrics["gpt_rhythm_accuracy_percent"] == 50
+    assert metrics["pipeline_beats_gpt_hr_mae"]
+
+
+def test_missing_gpt_predictions_never_produce_a_superiority_claim():
+    metrics = compare_gpt.comparison_metrics([row(72, None, 72, gpt_status="not_run", gpt_rhythm="unknown")])
+    assert metrics["gpt_paired_hr_mae_bpm"] is None
+    assert not metrics["pipeline_beats_gpt_hr_mae"]
+
+
+def test_gpt_baseline_bridge_receives_image_only(monkeypatch):
+    seen = []
+
+    def fake_bridge(request, timeout):
+        seen.append(request)
+        return {"status_code": 200, "report": {"heart_rate_bpm": 72, "rhythm": "regular"}, "model": "mock"}
+
+    monkeypatch.setattr(compare_gpt, "call_bridge", fake_bridge)
+    result = compare_gpt.estimate_gpt(b"test image")
+    assert set(seen[0]) == {"kind", "image"}
+    assert seen[0]["image"] == "data:image/png;base64," + base64.b64encode(b"test image").decode()
+    assert result["heart_rate_bpm"] == 72
+
+
+def test_offline_comparison_runs_all_fixed_images_without_llm(tmp_path, monkeypatch):
+    monkeypatch.setattr(compare_gpt, "call_bridge", lambda *args: pytest.fail("Offline run must not call GPT."))
+    result = compare_gpt.run_comparison(tmp_path, offline=True)
+    assert len(result["cases"]) == 10
+    assert result["metrics"]["pipeline_hr_coverage"] == 10
+    assert result["metrics"]["pipeline_all_hr_mae_bpm"] < 1
+    assert result["metrics"]["gpt_hr_coverage"] == 0
+    assert all(row["gpt"]["status"] == "not_run" for row in result["cases"])
+    assert (tmp_path / "comparison.md").exists()
+
+
+def test_same_gpt_prediction_is_reused_after_dsp_revision(tmp_path, monkeypatch):
+    import json
+
+    monkeypatch.setattr(compare_gpt.cfg, "COMPARISON_CASES", compare_gpt.cfg.COMPARISON_CASES[:1])
+    monkeypatch.setattr(compare_gpt.cfg, "COMPARISON_PAUSE_SECONDS", 0)
+    calls = []
+
+    def fake_gpt(image):
+        calls.append(image)
+        return {"status": "ok", "heart_rate_bpm": 45, "rhythm": "regular", "model": "mock"}
+
+    compare_gpt.run_comparison(tmp_path, gpt_requester=fake_gpt)
+    path = tmp_path / "comparison.json"
+    cached = json.loads(path.read_text())
+    cached["code_fingerprint"] = "older DSP version"
+    path.write_text(json.dumps(cached))
+    revised = compare_gpt.run_comparison(tmp_path, gpt_requester=lambda image: pytest.fail("Same GPT image must not be rerun."))
+    assert len(calls) == 1
+    assert revised["cases"][0]["gpt"]["cached"]
+    assert revised["cases"][0]["gpt"]["heart_rate_bpm"] == 45

@@ -16,8 +16,8 @@ permitted helper second opinion.
 | 2 Rules + LLM + API | 45 min | Complete | 11.8 min | 38 Python + 27 Node tests pass; signal API works; provider rejects required temperature |
 | 3 UI + plots | 60 min | Complete | 21.0 min | Desktop / mobile real demos pass, four plots visible, build passes on Node 22.18 |
 | 4 Image digitizer | 75 min | Complete | 30 min | 18 image tests, 14-case round-trip gate, actual browser multipart upload pass |
-| 5 GPT comparison | 25 min | In progress | 0 | Started 09:53 UTC; fixed 10 cases, matched images, bounded API calls |
-| 6 Wrap + checks | 5 min | Pending | 0 | Full pytest + existing Node tests, reproducible README |
+| 5 GPT comparison | 25 min | Complete | 20.3 min | 10 paired real GPT replies; HR MAE 0.00823 vs 0.02047; categorical accuracy ties at 100% |
+| 6 Wrap + checks | 5 min | In progress | 0 | Start 10:13:17 UTC; full pytest / Node / build, README and Git audit |
 
 ## Recon and assumptions
 
@@ -77,7 +77,7 @@ permitted helper second opinion.
 - [x] `/analyze-signal` works
 - [x] `/analyze` works on a rendered grid image
 - [x] Production GPT gets measured JSON only
-- [ ] `comparison.md` exists
+- [x] `comparison.md` exists
 - [ ] `pytest` passes
 - [ ] README has architecture diagram + limitations
 
@@ -155,3 +155,24 @@ permitted helper second opinion.
 - 09:53 UTC — Phase 4 complete and committed. Begin the 25-minute comparison
   box: use 10 predeclared synthetic cases, exact same calibrated PNG per method,
   annotation-like simulator R timing for true HR, and no training or cherry-picking.
+- 10:01 UTC — First live comparison: all 10 GPT responses succeeded; both methods
+  100% within ±3 bpm and 100% RR timing accuracy. GPT HR MAE 0.02047 bpm vs
+  pipeline 0.04037 bpm, so the initial pipeline did not beat GPT. Preserve this
+  result as `comparison-initial.md` / JSON instead of hiding or selecting cases.
+- 10:06 UTC — Fixed a general physical calibration bias: FFT autocorrelation
+  now accounts for fewer overlapping pixels at longer lags; time calibration
+  uses the long horizontal grid projection instead of averaging with the short
+  vertical projection. No learned parameter, threshold fitting or detector change.
+  Re-ran only the pipeline on all ten byte-identical images against the exact
+  same cached GPT predictions. New HR MAE 0.00823 bpm vs 0.02047 bpm (59.8% lower).
+  Both methods remain 100% for ±3 bpm and timing labels; the absolute difference
+  is very small and this is post-correction engineering validation, not a
+  held-out clinical accuracy study. Initial scores and method revision are linked.
+- 10:10 UTC — All 23 comparison / image regressions pass, including preserving
+  cached GPT predictions when only DSP changes. After the analytic correction,
+  the separate 14-case image validation gate remains PASS (MAE 0.001 bpm,
+  max 0.010 bpm). No new GPT calls, cases, or image changes were used to obtain
+  the revised result. All ten original GPT responses came from gpt-5.6-sol.
+- 10:13:17 UTC — Phase 5 complete; commit results, initial audit, comparison
+  script and analytic correction. Begin five-minute wrap. No phase exceeded
+  its time box; hard budget still has more than three hours remaining.

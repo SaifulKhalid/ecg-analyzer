@@ -40,6 +40,9 @@ def _spacing(profile: np.ndarray) -> float | None:
     fft_size = 1 << (2 * values.size - 1).bit_length()
     transform = np.fft.rfft(values, fft_size)
     correlation = np.fft.irfft(transform * np.conj(transform), fft_size)[:values.size]
+    # Fewer overlapping pixels at larger lags otherwise pull a subpixel peak
+    # toward zero, especially on the short vertical projection.
+    correlation /= np.arange(values.size, 0, -1)
     correlation /= max(correlation[0], cfg.NUMERICAL_EPSILON)
     limit = min(cfg.GRID_MAX_SPACING_PX, values.size // 3)
     candidates = [lag for lag in range(cfg.GRID_MIN_SPACING_PX, limit)
@@ -135,8 +138,8 @@ def digitize(image_bytes: bytes, *, pixels_per_mm: float | None = None,
             if abs(spacing_x - spacing_y) / scale > cfg.GRID_AXIS_DISAGREEMENT_FRACTION:
                 uncertain = True
                 warnings.append("Grid spacing disagrees between axes; provide pixels_per_mm.")
-            else:
-                scale = float((spacing_x + spacing_y) / 2)
+            # Time runs horizontally. The much longer x projection gives the
+            # time scale; y is a geometry check, not an extra HR measurement.
         else:
             warnings.append("Only one grid direction was recovered; square paper geometry is assumed.")
         warnings.append("Automatic calibration assumes the first detected grid repeat is 1 mm; confirm the scale.")
