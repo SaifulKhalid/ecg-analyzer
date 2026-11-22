@@ -12,8 +12,8 @@ permitted helper second opinion.
 | Phase | Budget | Status | Time spent | Evidence / fallback |
 | --- | ---: | --- | ---: | --- |
 | 0 Recon + skeleton | 15 min | Complete | 13.4 min | Baseline + skeleton; pinned environment; all five MIT-BIH records cached |
-| 1 Core DSP + gate | 75 min | In progress | 0 | Started 08:47:13 UTC; gate required before phase 2 |
-| 2 Rules + LLM + API | 45 min | Pending | 0 | Explanation may be null; measurements remain usable without API |
+| 1 Core DSP + gate | 75 min | Complete | 4.0 min | Record 100: 100% / 100%; means: 99.78% / 100%; 20 DSP tests pass |
+| 2 Rules + LLM + API | 45 min | In progress | 0 | Start 08:51 UTC; reuse client through measured-JSON bridge |
 | 3 UI + plots | 60 min | Pending | 0 | Preserve existing white/blue styling and add demo/results panel |
 | 4 Image digitizer | 75 min | Pending | 0 | If auto grid fails, require explicit pixels/mm; single-lead only |
 | 5 GPT comparison | 25 min | Pending | 0 | Unavailable GPT calls must be marked not run, never fabricated |
@@ -58,7 +58,7 @@ permitted helper second opinion.
 
 ## Definition of done
 
-- [ ] `validate.py` table exists with real numbers
+- [x] `validate.py` table exists with real numbers
 - [ ] Demo dropdown works end to end
 - [ ] `/analyze-signal` works
 - [ ] `/analyze` works on a rendered grid image
@@ -81,3 +81,10 @@ permitted helper second opinion.
 - 08:47:13 UTC — Phase 0 complete: all 15 requested MIT-BIH files cached; 9.75 MB
   of signal data plus original headers / annotations; pip check passes. Retried
   only missing files after transient 502 responses. Start phase 1 (75 min box).
+- 08:50 UTC — Own detector passed on the first attempt without dataset tuning:
+  100 / 101 / 106 / 119 each 100% sensitivity and PPV; 201 98.89% sensitivity,
+  100% PPV (one missed annotation at 48.7583 s). Macro means 99.78% / 100%.
+  `results/validation.md` and JSON contain original counts and timing errors.
+  20 tests pass (polarity, rates 45–130, hum / drift, resampling, feature formulas,
+  double-count prevention and invalid / flat inputs). Fixed cp1252 console
+  printing; no detector tuning is needed. Commit phase 1, then start phase 2.
