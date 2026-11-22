@@ -1,0 +1,100 @@
+{
+  "prepared_utc": "2026-11-22T14:10:02.184933+00:00",
+  "prepared_git_commit": "4c12a76ca797e419fd77f85999db674c7221b76e",
+  "measurement_fingerprint": "df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925",
+  "measurement_files": [
+    "config",
+    "preprocess",
+    "peaks",
+    "features",
+    "classify",
+    "quality",
+    "digitize",
+    "plots",
+    "synth"
+  ],
+  "lead_index": 0,
+  "scope": "Complete cached recordings; no selected intervals or excluded beats.",
+  "central_seconds": 290.0,
+  "context_seconds": 5.0,
+  "match_tolerance_seconds": 0.15,
+  "beat_symbols": [
+    "/",
+    "A",
+    "B",
+    "E",
+    "F",
+    "J",
+    "L",
+    "N",
+    "Q",
+    "R",
+    "S",
+    "V",
+    "a",
+    "e",
+    "f",
+    "j",
+    "n",
+    "r"
+  ],
+  "records": [
+    {
+      "record": "100",
+      "source_fs": 360,
+      "samples": 650000,
+      "seconds": 1805.5555555555557,
+      "file_sha256": {
+        "hea": "60ebc904c7bf3e04d142638d3fd5c903e8dc9f10f1ea3264e07926aa089ee75e",
+        "dat": "b2ea3c250e56e48f4b7b90697832b8ecd1afa1e0bb31f2dcfea4ed6e1075a639",
+        "atr": "8d8a5349fb16638ebbf649f1779d12e96d91b736b2aafe59db43719ae583d471"
+      }
+    },
+    {
+      "record": "101",
+      "source_fs": 360,
+      "samples": 650000,
+      "seconds": 1805.5555555555557,
+      "file_sha256": {
+        "hea": "d5f02fbe8673fa05465442191b98ca0d28a1670e7ef0e83fb9ef8723113a311c",
+        "dat": "698d1ea6f472d23ca50317c72c96cda2698badd8578220ed0380cdf241e39006",
+        "atr": "441cdd6486cfdf4c53e344d1048ab81296773e7058d53069022adc68543a0663"
+      }
+    },
+    {
+      "record": "106",
+      "source_fs": 360,
+      "samples": 650000,
+      "seconds": 1805.5555555555557,
+      "file_sha256": {
+        "hea": "ad5ed3ee5603926a07a09f0d0c9e2a7ff10a705dbafcde3d185317730a8839ab",
+        "dat": "c017bc18b95b1f970bca143a044ee5d54168648b541e47aa656f2737a59c1202",
+        "atr": "585347e6d1bd3ad89cdb52cb80945878a5e51026d81f871a376bb6e13936f7fa"
+      }
+    },
+    {
+      "record": "119",
+      "source_fs": 360,
+      "samples": 650000,
+      "seconds": 1805.5555555555557,
+      "file_sha256": {
+        "hea": "658f01382d7280a06e2f4c06363569d477394a6898c69ee788bb383f6092df63",
+        "dat": "02a286a28e69b441568add915f16a2856b22bab893bf8729ee9654411ed3a5aa",
+        "atr": "fd919c8ea20eed4a22fb37984977f30ce48d382eefd2d90934bf947a88e0fd7b"
+      }
+    },
+    {
+      "record": "201",
+      "source_fs": 360,
+      "samples": 650000,
+      "seconds": 1805.5555555555557,
+      "file_sha256": {
+        "hea": "dba34d6252879af28c1d10cde200989a4f6507d98df4395f5cba5f81af5b7e5a",
+        "dat": "16610ae46eff900794597503d15af4572a8b1518f18dbed2843b7e68c81f3898",
+        "atr": "df1276b6c6952b177ec6eea2be3edc7a96888454107a3ee56be880b0afaf6f35"
+      }
+    }
+  ],
+  "training": "none",
+  "post_result_tuning": "none"
+}

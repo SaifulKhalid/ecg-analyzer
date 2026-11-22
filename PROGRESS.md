@@ -281,3 +281,8 @@ temperature 0.2, so explanation can remain null while measured results work.
   to **15:33:48 UTC**, rather than silently resetting time. Commit the completed
   audit, then validate more cached MIT-BIH signal and strengthen explanation
   numeric grounding. No dataset training or changes to frozen measurement logic.
+- 14:07:48 UTC — Resumed from the saved checkpoint. Preserve all earlier results
+  and the frozen measurement fingerprint. Phase 11 uses complete cached records,
+  290-second half-open central windows with 5-second context (maximum 300 seconds),
+  original beat symbols and 150 ms one-to-one matching. Commit the protocol and
+  boundary tests before evaluating; do not tune DSP after seeing wider results.
