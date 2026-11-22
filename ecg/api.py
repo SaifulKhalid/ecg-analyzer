@@ -13,6 +13,7 @@ from .pipeline import analyze_signal
 from .preprocess import Signal
 from .samples import list_samples, load_sample
 from .digitize import digitize
+from . import report_plots
 
 app = FastAPI(title="Measured ECG screening", version=__version__, description=cfg.DISCLAIMER)
 
@@ -53,8 +54,10 @@ def analyze_signal_endpoint(body: SignalRequest) -> dict:
     try:
         signal = load_sample(body.sample_id) if body.sample_id is not None else Signal(
             np.asarray(body.samples, dtype=float), float(body.fs), {"source": "uploaded signal"})
-        return analyze_signal(signal, explain=body.explain, notch_hz=body.notch_hz,
-                              allow_provider_default_temperature=body.allow_provider_default_temperature)
+        result = analyze_signal(signal, explain=body.explain, include_plots=False, notch_hz=body.notch_hz,
+                                allow_provider_default_temperature=body.allow_provider_default_temperature)
+        result["plots"] = report_plots.for_signal(signal, result["measurements"], body.notch_hz)
+        return result
     except (ValueError, OSError) as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -70,8 +73,9 @@ def analyze_image_endpoint(image: UploadFile = File(...), pixels_per_mm: float |
         image_bytes = image.file.read(cfg.MAX_IMAGE_BYTES + 1)
         recovered = digitize(image_bytes, pixels_per_mm=pixels_per_mm, paper_speed=paper_speed,
                              gain=gain, crop_box=bounds)
-        result = analyze_signal(recovered.signal, explain=explain, notch_hz=notch_hz,
+        result = analyze_signal(recovered.signal, explain=explain, include_plots=False, notch_hz=notch_hz,
                                 allow_provider_default_temperature=allow_provider_default_temperature)
+        result["plots"] = report_plots.for_signal(recovered.signal, result["measurements"], notch_hz)
         result["plots"]["digitization"] = base64.b64encode(recovered.debug_overlay).decode("ascii")
         return result
     except (ValueError, OSError, TypeError) as error:

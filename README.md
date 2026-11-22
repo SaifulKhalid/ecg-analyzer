@@ -2,9 +2,10 @@
 
 **Educational screening tool, not a medical device.**
 
-The existing Node / vanilla web app now measures single-lead ECG signals with
-our own DSP. GPT explains the measured JSON; it receives no image or raw samples
-in production. Findings are possible or suggestive and need clinician review.
+The Node / vanilla web app presents single-lead ECG measurements as a scientific
+report: sequential figures, a measured-values table, input-dependent Notes,
+JSON download and printing. The page always requests explain=false and leaves
+interpretation to the clinician. The existing explanation API remains available.
 There is no dataset training.
 
 ## Architecture
@@ -64,9 +65,10 @@ Start the existing frontend in another terminal:
 npm start
 ```
 
-Open **http://localhost:3000** and choose **Try demo ECG**. Five MIT-BIH demos
-appear when downloaded; four synthetic demos always work offline. Uncheck the
-AI explanation option to use DSP alone.
+Open **http://localhost:3000**, choose a **Sample record** or **Choose file**, and
+select **Analyze**. Five MIT-BIH records appear when downloaded; four synthetic
+records work offline. The collapsed **Calibration** fields accept scale, speed,
+gain, crop and mains frequency. The page displays measurements only.
 
 Backend default: **127.0.0.1:8765**. Port 8000 was blocked on this Windows machine.
 To choose another port, run `python -m uvicorn ecg.api:app --port PORT_NUMBER` in
@@ -80,11 +82,11 @@ Environment variables take precedence. Models default to `gpt-5.6-sol` and
 
 **Temperature policy:** strict temperature 0.2 remains the default. Both current
 AgentRouter models reject it, so strict mode returns `explanation: null` with an
-error note. Enable **Allow provider default if temperature 0.2 is unsupported**
+error note. Set the API's allow_provider_default_temperature parameter to true
 to explicitly request compatibility mode. Only an unsupported-temperature error
 triggers one retry of the same measured JSON with the same model / key at the
-provider default. The response includes `explanation_settings`, and the UI shows
-when compatibility was used. Other errors retain normal fallback / error handling.
+provider default. The response includes `explanation_settings`. The report UI
+does not request or display explanations. Other errors retain normal fallback / error handling.
 Live five-section explanation evidence: [llm-compatibility.json](results/llm-compatibility.json).
 The image-only benchmark continues to use the model default temperature.
 

@@ -1,5 +1,44 @@
 # UI flow verification
 
+## Report UI verification (2026-11-23 Asia/Dhaka)
+
+Part B: PASS. Installed Chrome, driven through tests/ui_qa.mjs using CDP; no
+additional QA or runtime dependency. Actual requests go through Node :3000 to
+the local FastAPI service :8765. The UI always sends explain=false.
+
+| Input | Width | Figures | Overflow | Console errors | Copy-deck audit |
+| --- | ---: | ---: | --- | ---: | --- |
+| MIT-BIH 100 | 1280 | 4, sequentially numbered | None | 0 | PASS |
+| Calibrated 72 bpm image strip | 1280 | 6, sequentially numbered | None | 0 | PASS |
+| MIT-BIH 100 | 390 | 4, sequentially numbered | None | 0 | PASS |
+| Calibrated 72 bpm image strip | 390 | 6, sequentially numbered | None | 0 | PASS |
+
+Checks: table contains all 11 parameters and correct rounding; RR CV displays
+4.6% for record 100; sample Notes absent; image Notes contain only calibration
+assumptions. Captions are one line below figures. One footer only. Calibration
+starts collapsed. Enabled buttons are solid navy; disabled buttons are dimmed.
+Print media hides Input and actions, and figures avoid internal page breaks.
+The DOM text is saved in test-results/part-b-*-dom.txt; rg banned-word search
+returns no matches. QA also checks all displayed text against the deck plus
+record IDs, measured values and input-dependent Notes.
+
+Report plots use ecg/report_plots.py: 200 dpi, no titles, labeled axes, pink
+0.04 s/0.1 mV minor and 0.2 s/0.5 mV major grid, near-black waveforms, red filled
+R markers, gray/navy spectra with a dashed mains legend entry, a 105 dB display
+range, and small tachogram markers. Frozen ecg/plots.py remains unchanged.
+
+Full pytest: 113 passed. npm test: 31 passed. Dedicated plot checks assert no
+titles, axis units, marker color and encoded 200 dpi. Original explanation
+code and its API/client tests still pass. Actual frozen fingerprint matches
+df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925.
+
+Local artifacts: test-results/part-b-qa.json and
+test-results/part-b-{sample,image}-{1280,390}.png. Desktop screenshot visually
+inspected. These generated artifacts are ignored; supplied images are untouched.
+Browser resizing and full-report verification will be recorded below in Part C.
+
+The earlier verification follows for historical context; it describes the old UI.
+
 Educational screening tool, not a medical device.
 
 Generated: 2026-11-22T16:43:26.582253+00:00

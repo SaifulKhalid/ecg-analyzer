@@ -1,5 +1,57 @@
 # ECG measurement mission
 
+## Unattended continuation: report UI and automatic report regions
+
+Start: 2026-11-22 21:05:38 UTC. Five-hour ceiling: 2026-11-23 02:05:38 UTC.
+The later unattended instruction adds persistence and local commits, not a new
+deployment. No questions, global installations, system-setting changes or
+deployment commands will be made during this continuation.
+
+The user explicitly resolved the plotting conflict: new ecg/report_plots.py,
+with API wiring outside the frozen modules. All nine frozen files remain intact.
+Part A is already complete; preserve its environment/data and use its passing
+results. Re-run complete tests and the real fingerprint at the end.
+
+Decisions:
+- Sample options use record IDs, which are data identifiers; omit descriptive
+  labels that introduce text outside the copy deck.
+- The fixed filter-boundary warning is omitted because it is identical on every
+  run. Image calibration warnings appear only for image inputs.
+- Use existing Pillow (a Matplotlib dependency) and OpenCV for new image code;
+  no new dependency or provider is needed.
+- Browser QA uses installed Chrome and Node's CDP/WebSocket support, without
+  installing a browser package. CSP only permits data image URLs, so browser
+  resizing and decoding use FileReader/canvas data URLs.
+- Image sizes use decimal byte thresholds (25,000,000 original; 3,500,000 upload)
+  to leave headroom under the 4.5 MB request limit. If quality-0.9 JPEG still
+  exceeds 3.5 MB, reduce dimensions further without changing that quality.
+- Manual crop coordinates refer to the EXIF-oriented original upload. Scale
+  coordinates and manual pixels/mm when the browser/backend resizes. Disable
+  automatic rotation/deskew for a manual crop so that the selected region wins.
+
+| Phase | Status | Evidence / elapsed |
+| --- | --- | --- |
+| Part A | PASS | Existing completed setup: 111 Python / 31 Node tests, MIT-BIH, matching hash |
+| Part B | PASS | 16 minutes; full 113 Python / 31 Node tests; 1280/390 record/image QA, DOM deck/banned audit, print hiding, 200 dpi/red-marker tests pass |
+| Part C P1 detection/generator | Active | Started 21:21 UTC; 45 minute maximum |
+| Part C P2 scoring/API | Pending | 30 minute maximum |
+| Part C P3 robustness | Pending | 30 minute maximum |
+| Part C P4 UI/docs/final QA | Pending | 15 minute maximum |
+
+Definition of Done:
+- [x] Part A: environment works; pytest/npm test pass; fingerprint matches.
+- [x] Part B: report UI done; results/ui-verification.md written; DOM grep clean.
+- [ ] Part C: full synthetic report works with no crop; layout-validation.md exists.
+- [ ] Full final pytest/npm test pass; frozen fingerprint unchanged.
+- [ ] Final report: files, run commands, results, assumptions, blocked items, limits.
+
+Blocked:
+- None currently. The initial UI browser attempt had no listening backend after
+  a detached launch. A direct normal API process fixed it. The next copy audit
+  needed to tokenize table tabs; corrected the QA harness. A subsequent image
+  check exposed blob URLs blocked by the existing CSP; switched the UI to data
+  URLs and the full browser flow passed. No checks were weakened.
+
 ## New-laptop setup and report UI request (2026-11-23 Asia/Dhaka)
 
 Started 2026-11-22 20:51 UTC; Part A has a 15-minute maximum.
