@@ -26,7 +26,7 @@ permitted helper second opinion.
 | 11 Longer MIT-BIH validation | 25 min | Complete | 2.6 min | 150.46 minutes; macro sensitivity 99.47%, PPV 99.94%; 6 boundary tests pass |
 | 12 Explanation grounding | 30 min | Complete | 14 min resumed | Typed / labeled numbers, report-only definitions, mocked failures; live guarded five-section response |
 | 13 Documentation / live QA | 20 min | Complete | 6.7 min | README / API provenance, 111 Python tests, build, actual desktop/mobile demos and upload, saved live reply rendering |
-| 14 Extended wrap | 5 min | In progress | 0 | Final Git / credential-data / frozen-code audits; latest Continue authorizes post-interruption completion |
+| 14 Extended wrap | 5 min | Complete | 3.5 min | Clean Git, no tracked data / credentials or configured key values, frozen measurement hash matches, health + 9 demos ready |
 
 ## Recon and assumptions
 
@@ -103,6 +103,7 @@ permitted helper second opinion.
 - [x] Actual measured-JSON-only live reply passes numeric checks and all five sections
 - [x] Browser replay uses matching fresh signal measurements/plots and displays grounding provenance
 - [x] Full 111-test Python suite and 30-test Node suite pass; Worker build passes
+- [x] Final Git / data-credential / configured-key / frozen-code audits pass
 
 ## Work log
 
@@ -228,7 +229,7 @@ permitted helper second opinion.
 | 10 | Legacy-null / unavailable-initial reporting cases and tests | `4c12a76` |
 | 11 | `validate_long.py`, window-boundary tests, predeclared protocol and full-record results | `78ddc7c`, `0c1a9e1` |
 | 12 | `grounding.py`, `report.py`, API provenance / shared prompt, grounding tests, both live artifacts | `d06a289` |
-| 13 | README wider results / grounding limits, `app.js` JSON provenance, structured UI verification | Documentation / UI checkpoint |
+| 13 | README wider results / grounding limits, `app.js` JSON provenance, structured UI verification | `faaf995` |
 | 14 | Final progress, frozen-code / data-secret / Git audit | Extended wrap checkpoint |
 
 No dataset training; no threshold fitting to patient labels; no phase overrun.
@@ -343,3 +344,12 @@ temperature 0.2, so explanation can remain null while measured results work.
   passes under isolated Node 22.18. Nonfatal upstream PyParsing warnings remain.
   README includes wider results, all unmatched-count limits, report definitions,
   conservative grounding / written-number limits and unchanged clinical scope.
+- 16:47:45 UTC — Final audit: no tracked `data/`, credential files or actual
+  configured AgentRouter key values in any tracked file. Both configured keys
+  were checked without printing them. Measurement hash remains
+  `df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925`.
+  Original first-minute mean sensitivity / PPV remain 99.77778% / 100%; whole
+  records remain 99.47127% / 99.93723%. Git and whitespace checks pass. Normal
+  Node -> FastAPI `/health` is ok at 250 Hz; all 9 demos are listed. Leave only
+  the normal local services running for the user. No new feature scope, dataset
+  training, threshold tuning or deployment. Commit this extended wrap checkpoint.
