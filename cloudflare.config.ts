@@ -8,10 +8,8 @@ export default defineConfig({
     workersDev: true,
     env: {
       ASSETS: bindings.assets(),
-      AGENTROUTER_API_KEY: bindings.secret(),
-      AGENTROUTER_API_KEY_2: bindings.secret(),
-      // Supply a reachable FastAPI URL when building / deploying the measured UI.
-      ECG_API_URL: bindings.text(process.env.ECG_API_URL || ''),
+      // Provider credentials live in the backend's production environment.
+      ECG_API_URL: bindings.text(process.env.ECG_API_URL || 'https://ecg-analyzer-dsp-khalid-saifullahs-projects-239e324e.vercel.app'),
     },
     assets: {
       runWorkerFirst: true,

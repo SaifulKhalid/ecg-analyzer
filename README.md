@@ -268,6 +268,10 @@ accuracy evidence. The original image is preserved and excluded from Git.
 
 ## Production deployment
 
+- Frontend: https://ecg-analyzer.labddb.workers.dev
+- Backend: https://ecg-analyzer-dsp-khalid-saifullahs-projects-239e324e.vercel.app
+- Public source: https://github.com/SaifulKhalid/ecg-analyzer
+
 The Worker / Vite build remains supported. With Node 22.18+, run `npm run build`.
 This machine's Node 22.14 required an isolated runtime for verification:
 
@@ -290,12 +294,12 @@ image serves the four synthetic demos; cached MIT-BIH data stays local.
 Vercel builds the container from the Git repository, so Docker is not required
 on this Windows machine. Container Functions scale to zero after five minutes
 idle and can take longer on the first request. Vercel's request/response limit
-is 4.5 MB; production uploads must fit within that limit, even though the local
-API accepts images up to 10 MB. AI explanation remains optional and retains
+is 4.5 MB; the frontend caps images at 4 MB to leave room for multipart fields.
+The local API accepts images up to 10 MB. AI explanation remains optional and retains
 the existing strict-temperature and numeric-grounding checks.
 
 ```powershell
-$env:ECG_API_URL = 'https://YOUR_BACKEND.vercel.app'
+# ECG_API_URL overrides the deployed backend default when needed.
 npm.cmd exec --yes --package=node@22.18.0 -c "cf build"
 npm.cmd exec --yes --package=node@22.18.0 -c "cf deploy --prebuilt"
 ```

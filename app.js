@@ -208,9 +208,9 @@ imageInput.addEventListener('change', async () => {
     imageInput.value = '';
     return showError('Choose a PNG, JPG, or WebP image.');
   }
-  if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+  if (file.size === 0 || file.size > 4 * 1024 * 1024) {
     imageInput.value = '';
-    return showError('Choose a non-empty image under 10 MB.');
+    return showError('Choose a non-empty image under 4 MB.');
   }
   status.textContent = 'Opening image…';
   status.hidden = false;
