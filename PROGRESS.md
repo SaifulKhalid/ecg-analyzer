@@ -1,5 +1,52 @@
 # ECG measurement mission
 
+## New-laptop setup and report UI request (2026-11-23 Asia/Dhaka)
+
+Started 2026-11-22 20:51 UTC; Part A has a 15-minute maximum.
+
+Stack/current state (five lines):
+1. FastAPI owns the NumPy/SciPy measurement pipeline and OpenCV digitizer.
+2. Vanilla HTML/CSS/JavaScript runs through a Node proxy; Vite/Cloudflare builds are supported.
+3. Prior verification recorded 111 Python tests and 30 Node tests passing.
+4. This checkout has no virtual environment, Node dependencies, cached data, or credential files.
+5. Git exists outside PATH; Python/Node need isolated local runtimes before setup can run.
+
+Assumptions and constraints:
+- Use portable Python 3.13.7 and Node 22.23.0 in the user's local application directory. Update the user's PATH, without changing system-wide settings. An installer launch was automatically rejected; portable runtime extraction is the safe fallback. Node 22.18 installed successfully but the locked Cloudflare package now requires 22.23; upgraded before final npm install/test.
+- Use the existing constraints.txt, including pandas 2.2.3; no measurement logic changes are authorized in Part A.
+- No configured AgentRouter environment keys, .env, or config.local.js were found. Create .env from .env.example when credentials are wanted; proceed with ECG_LLM_ENABLED=0 and explain=false.
+- Git's Windows core.autocrlf=true changes source bytes on clone. Verify the frozen hash against the committed LF files and preserve LF checkout bytes if necessary.
+- Part B is internally inconsistent: scripts/compare_holdout.py hashes ecg/plots.py as a frozen measurement file, but Part B requires changing that file while keeping the same fingerprint. Do not redefine the fingerprint or alter its manifest to claim a match. Finish Part A before reporting this blocker.
+
+Part A verification:
+
+| Step | Result | Evidence |
+| --- | --- | --- |
+| 1 Read progress/README/history | PASS | Read both documents and the latest 15 commits; five-line stack summary above |
+| 2 Python/Node setup | PASS | Python 3.13.7 .venv; requirements with constraints; pip check clean; Node 22.23.0 npm install clean |
+| 3 Credential names | PASS (fallback) | Names verified in .env.example; no local credentials configured; create .env from .env.example; backend runs with ECG_LLM_ENABLED=0 |
+| 4 MIT-BIH download | PASS | scripts/download_data.py downloaded 100, 101, 106, 119, 201 |
+| 5 Full tests | PASS | Final pytest: 111 passed, 14 upstream deprecation warnings, 56.06 s; npm test: 31 passed; no logic fixes |
+| 6 Frozen fingerprint | PASS | Actual scripts.compare_holdout.measurement_fingerprint() equals df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925 |
+| 7 Services/sample | PASS | Backend :8765 and frontend :3000 running; real mitdb-100 request through frontend proxy returns ok, 74 R peaks, 73.867 bpm, four valid PNG plots |
+
+The initial Python run passed 110 tests and skipped the MIT-BIH image test while
+the downloader was still running. Re-ran the full suite after the download to
+execute all 111 tests. No tests were weakened or skipped in the final run.
+
+Setup fixes: .gitattributes preserves Python LF bytes, package.json/package-lock.json
+and README require Node 22.23, and results/setup-verification.md records evidence.
+Git had no author identity configured; use repository-local Codex / codex@localhost
+for the authorized setup commit. Data, runtimes and credentials remain untracked.
+
+Part B: reached the frozen-plot conflict and stopped before UI/plot edits. Required
+edits to ecg/plots.py would invalidate the mandatory unchanged hash. Part C is not
+started because the preceding part cannot be completed under both constraints.
+No fingerprint definition, holdout manifest, measurements, UI, or automatic region
+selection implementation was changed. This is an incomplete UI/layout request,
+not a successful UI/layout validation. See results/setup-verification.md.
+
+
 Educational screening tool, not a medical device.
 
 Start: **2026-11-22 08:33:48 UTC / 14:33:48 Asia/Dhaka**.

@@ -45,7 +45,7 @@ is used exclusively by the comparison script.
 
 ## Run locally
 
-Use **Python 3.13** (tested) and **Node 22.18+**. From this directory in PowerShell:
+Use **Python 3.13** (tested) and **Node 22.23+**. From this directory in PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -272,11 +272,11 @@ accuracy evidence. The original image is preserved and excluded from Git.
 - Backend: https://ecg-analyzer-dsp-khalid-saifullahs-projects-239e324e.vercel.app
 - Public source: https://github.com/SaifulKhalid/ecg-analyzer
 
-The Worker / Vite build remains supported. With Node 22.18+, run `npm run build`.
-This machine's Node 22.14 required an isolated runtime for verification:
+The Worker / Vite build remains supported. With Node 22.23+, run `npm run build`.
+For an older local Node version, use an isolated runtime:
 
 ```powershell
-npm.cmd exec --yes --package=node@22.18.0 -c "cf build"
+npm.cmd exec --yes --package=node@22.23.0 -c "cf build"
 ```
 
 The frontend runs on Cloudflare Workers. The Worker proxies measured endpoints
@@ -300,8 +300,8 @@ the existing strict-temperature and numeric-grounding checks.
 
 ```powershell
 # ECG_API_URL overrides the deployed backend default when needed.
-npm.cmd exec --yes --package=node@22.18.0 -c "cf build"
-npm.cmd exec --yes --package=node@22.18.0 -c "cf deploy --prebuilt"
+npm.cmd exec --yes --package=node@22.23.0 -c "cf build"
+npm.cmd exec --yes --package=node@22.23.0 -c "cf deploy --prebuilt"
 ```
 
 **Educational screening tool, not a medical device.**

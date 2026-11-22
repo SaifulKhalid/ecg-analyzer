@@ -1,0 +1,3 @@
+# The frozen holdout fingerprint hashes Python source bytes, including newlines.
+# Keep the committed LF bytes on Windows checkouts as well.
+*.py text eol=lf
