@@ -50,7 +50,7 @@ def _png(figure):
     return base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
-def render_plots(processed: Preprocessed, peaks: np.ndarray) -> dict[str, str]:
+def render_plots(processed: Preprocessed, peaks: np.ndarray, *, amplitude_calibrated=True) -> dict[str, str]:
     """Four figures, without titles, using exactly the already measured events."""
     with _lock:
         count = min(processed.raw.size, round(MAX_SECONDS * processed.fs))
@@ -59,10 +59,11 @@ def render_plots(processed: Preprocessed, peaks: np.ndarray) -> dict[str, str]:
         plots = {}
         figure = _figure(4.5)
         raw, filtered = figure.subplots(2, 1, sharex=True)
-        for axis, samples, label in ((raw, processed.raw, "Raw (mV)"),
-                                     (filtered, processed.filtered, "Filtered (mV)")):
+        unit = "mV" if amplitude_calibrated else "a.u."
+        for axis, samples, label in ((raw, processed.raw, f"Raw ({unit})"),
+                                     (filtered, processed.filtered, f"Filtered ({unit})")):
             axis.plot(time, samples[:count], color=TRACE, linewidth=0.65)
-            _axes(axis, label, "" if axis is raw else "Time (s)", paper=True)
+            _axes(axis, label, "" if axis is raw else "Time (s)", paper=amplitude_calibrated)
             axis.set_xlim(0, shown)
         plots["raw_filtered"] = _png(figure)
 
@@ -75,7 +76,7 @@ def render_plots(processed: Preprocessed, peaks: np.ndarray) -> dict[str, str]:
         if processed.notch_hz:
             axis.axvline(processed.notch_hz, color=TRACE, linestyle="--", linewidth=0.7,
                          label=f"Mains ({processed.notch_hz:g} Hz)")
-        _axes(axis, "PSD (dB re 1 mV²/Hz)", "Frequency (Hz)")
+        _axes(axis, f"PSD (dB re 1 {unit}²/Hz)", "Frequency (Hz)")
         axis.set_xlim(0, min(processed.fs / 2, 80))
         ceiling = float(max(before.max(), after.max())) + 5
         axis.set_ylim(ceiling - 105, ceiling)
@@ -88,7 +89,7 @@ def render_plots(processed: Preprocessed, peaks: np.ndarray) -> dict[str, str]:
         visible = peaks[(peaks >= 0) & (peaks < count)]
         axis.scatter(visible / processed.fs, processed.filtered[visible], s=15,
                      facecolors="#e00000", edgecolors="#e00000", linewidths=0, zorder=4)
-        _axes(axis, "Filtered (mV)", paper=True)
+        _axes(axis, f"Filtered ({unit})", paper=amplitude_calibrated)
         axis.set_xlim(0, shown)
         plots["r_peaks"] = _png(figure)
 
@@ -103,10 +104,10 @@ def render_plots(processed: Preprocessed, peaks: np.ndarray) -> dict[str, str]:
         return plots
 
 
-def for_signal(signal: Signal, measurements: dict, notch_hz=50) -> dict[str, str]:
+def for_signal(signal: Signal, measurements: dict, notch_hz=50, *, amplitude_calibrated=True) -> dict[str, str]:
     processed = preprocess(signal, notch_hz=notch_hz)
     peaks = np.rint(np.asarray(measurements["r_peak_times_s"]) * processed.fs).astype(int)
-    return render_plots(processed, peaks)
+    return render_plots(processed, peaks, amplitude_calibrated=amplitude_calibrated)
 
 
 def encode_image(rgb: np.ndarray) -> str:
@@ -123,15 +124,14 @@ def encode_image(rgb: np.ndarray) -> str:
     return base64.b64encode(image.tobytes()).decode("ascii")
 
 
-def trace_overlay(rgb: np.ndarray, recovered) -> str:
+def trace_overlay(rgb: np.ndarray, recovered, measurement_image=None) -> str:
     """Place the recovered trace on the full prepared page, one pixel wide."""
-    calibration = recovered.calibration
-    left, top, right, bottom = calibration["crop_box"]
-    strip = rgb[top:bottom, left:right]
     # The frozen digitizer's overlay contains the exact column positions. Retain
     # those positions but omit its crop rectangle and use a contrasting trace.
     original = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
     debug = cv2.imdecode(np.frombuffer(recovered.debug_overlay, np.uint8), cv2.IMREAD_COLOR)
     green = (debug[:, :, 1].astype(int) > debug[:, :, 0].astype(int) + 35) & (debug[:, :, 1].astype(int) > debug[:, :, 2].astype(int) + 35)
+    if measurement_image is not None:
+        green &= np.any(debug != cv2.cvtColor(measurement_image, cv2.COLOR_RGB2BGR), axis=2)
     original[green] = (190, 70, 0)
     return encode_image(cv2.cvtColor(original, cv2.COLOR_BGR2RGB))

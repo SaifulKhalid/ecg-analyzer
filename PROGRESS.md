@@ -34,8 +34,8 @@ Decisions:
 | Part A | PASS | Existing completed setup: 111 Python / 31 Node tests, MIT-BIH, matching hash |
 | Part B | PASS | 16 minutes; full 113 Python / 31 Node tests; 1280/390 record/image QA, DOM deck/banned audit, print hiding, 200 dpi/red-marker tests pass |
 | Part C P1 detection/generator | PASS | 11 minutes; 32 declared variants; 16 candidate/orientation/noise tests pass; JPEG/grid-crossing correction made only in new files |
-| Part C P2 scoring/API | Active | Started 21:31 UTC; 30 minute maximum |
-| Part C P3 robustness | Pending | 30 minute maximum |
+| Part C P2 scoring/API | PASS | 13 minutes; cap-8 scoring, manual precedence, no-grid/time-only handling; seven selection tests, two legacy image API checks, 105 bpm API, full-report 1280/390 browser flows pass |
+| Part C P3 robustness | Active | Started 21:43 UTC; 30 minute maximum |
 | Part C P4 UI/docs/final QA | Pending | 15 minute maximum |
 
 Definition of Done:
@@ -51,6 +51,19 @@ Blocked:
   needed to tokenize table tabs; corrected the QA harness. A subsequent image
   check exposed blob URLs blocked by the existing CSP; switched the UI to data
   URLs and the full browser flow passed. No checks were weakened.
+
+P2 validation: the initial declared 32-case run passed 19/27 long layouts and
+5/5 short/uncalibrated layouts. All eight failures were at 105/120 bpm with a
+crop tightly around one waveform: its small vertical size triggered the frozen
+multi-band safety check. Added a 30 mm paper region around a single lead,
+bounded by neighboring-row valleys. The 105 bpm regression now returns 104.987
+bpm with no quality reasons. The initial JSON/Markdown is preserved locally in
+test-results/layout-validation-initial.*; the full fixed run is in progress.
+This is layout engineering validation, with no changes to frozen thresholds.
+
+No-grid amplitude-dependent range/gain are null and plots use arbitrary units.
+SNR remains numeric because it is a dimensionless power ratio and does not
+depend on the unknown amplitude scale. The mandatory no-grid Note is shown.
 
 ## New-laptop setup and report UI request (2026-11-23 Asia/Dhaka)
 

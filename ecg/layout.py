@@ -5,10 +5,15 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
+from .digitize import digitize, _spacing
+from .features import extract_features
+from .pipeline import analyze_signal
 
 MAX_CANDIDATES = 8
 LONG_STRIP_FRACTION = 0.85
 MIN_REGION_SECONDS = 5.0
+PAPER_REGION_HEIGHT_MM = 30.0
+NO_GRID_NOTE = "Time scale assumed: strip width = 10 s at 25 mm/s. Amplitude not calibrated."
 
 
 @dataclass
@@ -16,6 +21,151 @@ class Candidate:
     kind: str
     box: list[int]
     band: int
+
+
+@dataclass
+class Selection:
+    candidate: Candidate | None
+    recovered: object | None
+    result: dict
+    candidates: list[dict]
+    notes: list[str]
+    measurement_image: np.ndarray | None
+    amplitude_calibrated: bool = True
+
+
+def unmeasured_result(reason, *, no_trace=False):
+    measurements = extract_features(np.array([], dtype=int), 250, None)
+    measurements.update(fs_hz=None, beat_count=None)
+    status = "no_ecg_detected" if no_trace else "insufficient_quality"
+    return {"status": status, "quality": {"status": "insufficient_quality", "reasons": [reason],
+            "beat_count": 0, "snr_db": None, "signal_range_mv": None, "rr_plausible_fraction": None},
+            "measurements": measurements, "findings": [], "explanation": None, "plots": {},
+            "warnings": [reason], "notes": [reason], "source": {}, "detector": {}}
+
+
+def _grid_info(rgb, box):
+    left, top, right, bottom = box
+    strip = rgb[top:bottom, left:right]
+    hsv = cv2.cvtColor(strip, cv2.COLOR_RGB2HSV)
+    gray = cv2.cvtColor(strip, cv2.COLOR_RGB2GRAY)
+    masks = [((hsv[:, :, 1] >= 10) & (hsv[:, :, 2] > 100) & (gray > 155)),
+             ((gray > 160) & (gray < 245))]
+    for mask in masks:
+        if not 0.01 <= mask.mean() <= 0.65:
+            continue
+        x_spacing = _spacing(mask.mean(axis=0))
+        y_spacing = _spacing(mask.mean(axis=1))
+        if x_spacing is not None and y_spacing is not None and abs(x_spacing-y_spacing)/x_spacing < 0.2:
+            return x_spacing, mask
+    return None, None
+
+
+def _quality_reason(result, reason):
+    result["status"] = result["quality"]["status"] = "insufficient_quality"
+    result["quality"]["reasons"] = list(dict.fromkeys([*result["quality"]["reasons"], reason]))
+    result["warnings"] = list(dict.fromkeys([*result["warnings"], reason]))
+    result["findings"] = []
+
+
+def select_region(rgb: np.ndarray, *, pixels_per_mm=None, paper_speed=25, gain=10,
+                  crop_box=None, notch_hz=50) -> Selection:
+    """Evaluate at most eight independent strips/cells with the frozen pipeline."""
+    all_proposals = [Candidate("manual", list(crop_box), -1)] if crop_box is not None else detect_candidates(rgb)
+    neighbors = [(proposal, proposal.box.copy()) for proposal in all_proposals]
+    proposals = all_proposals[:MAX_CANDIDATES]
+    if not proposals:
+        return Selection(None, None, unmeasured_result("No ECG trace detected in the image.", no_trace=True), [], [], None)
+    evaluated = []
+    for candidate in proposals:
+        spacing, grid_mask = _grid_info(rgb, candidate.box)
+        scale = pixels_per_mm if pixels_per_mm is not None else spacing
+        amplitude_calibrated = scale is not None
+        notes = []
+        full_width = candidate.box[2]-candidate.box[0] >= rgb.shape[1]*LONG_STRIP_FRACTION
+        if scale is None:
+            if not full_width or paper_speed != 25:
+                result = unmeasured_result("Time scale could not be determined.")
+                evaluated.append((candidate, None, result, [], None, False))
+                continue
+            scale = (candidate.box[2]-candidate.box[0])/(10*25)
+            notes.append(NO_GRID_NOTE)
+        if crop_box is None:
+            # A tightly clipped waveform can look like several bands to the
+            # frozen digitizer. Keep physical paper context around ONE lead,
+            # bounded by valleys to neighboring rows; never change its gate.
+            left, top, right, bottom = candidate.box
+            rows = np.nonzero(ink_mask(rgb[top:bottom, left:right]))[0]
+            center = top + (float(np.median(rows)) if rows.size else (bottom-top)/2)
+            new_top = max(0, round(center-PAPER_REGION_HEIGHT_MM*float(scale)/2))
+            new_bottom = min(rgb.shape[0], round(center+PAPER_REGION_HEIGHT_MM*float(scale)/2))
+            for other, other_box in neighbors:
+                if other is candidate or other_box[0] >= right or other_box[2] <= left:
+                    continue
+                if other_box[3] <= top:
+                    new_top = max(new_top, (other_box[3]+top)//2)
+                elif other_box[1] >= bottom:
+                    new_bottom = min(new_bottom, (bottom+other_box[1])//2)
+            candidate.box = [left, min(top, new_top), right, max(bottom, new_bottom)]
+            updated_spacing, grid_mask = _grid_info(rgb, candidate.box)
+            if pixels_per_mm is None and updated_spacing is not None:
+                spacing = scale = updated_spacing
+                amplitude_calibrated = True
+                notes = []
+        measurement_image = rgb.copy()
+        if grid_mask is not None:
+            left, top, right, bottom = candidate.box
+            crop = measurement_image[top:bottom, left:right]
+            # The frozen digitizer knows pink/red grids. Normalize only light
+            # grid pixels; dark trace pixels and the original preview are kept.
+            crop[grid_mask] = (245, 175, 190)
+        try:
+            ok, png = cv2.imencode(".png", cv2.cvtColor(measurement_image, cv2.COLOR_RGB2BGR))
+            if not ok:
+                raise ValueError("Could not prepare the measurement region.")
+            recovered = digitize(png.tobytes(), pixels_per_mm=float(scale), paper_speed=paper_speed,
+                                 gain=gain, crop_box=candidate.box)
+            result = analyze_signal(recovered.signal, explain=False, include_plots=False, notch_hz=notch_hz)
+            if pixels_per_mm is None and spacing is not None:
+                recovered.calibration["method"] = "automatic grid autocorrelation"
+            if not amplitude_calibrated:
+                recovered.calibration.update(gain=None, method="assumed 10 s time scale; amplitude uncalibrated")
+                result["quality"]["signal_range_mv"] = None
+                result["warnings"] = [warning for warning in result["warnings"]
+                                      if not warning.startswith(("Image conversion assumes", "Pink/red grid", "Automatic calibration"))]
+            recovered.calibration["amplitude_calibrated"] = amplitude_calibrated
+            if candidate.kind != "manual" and result["measurements"]["duration_s"] < MIN_REGION_SECONDS:
+                _quality_reason(result, "Selected region is too short for reliable measurement (less than 5 s).")
+            evaluated.append((candidate, recovered, result, notes, measurement_image, amplitude_calibrated))
+        except (ValueError, TypeError, OSError, cv2.error) as error:
+            # The digitizer's multiple-band check remains a safety net. A failed
+            # proposal never triggers blending or stitching of different leads.
+            message = "Selected region could not be measured."
+            if "too few columns" in str(error):
+                message = "Image resolution is too low for reliable measurement."
+            elif "seconds" in str(error):
+                message = "Selected region is too short for reliable measurement (less than 2 s)."
+            elif "Multiple trace bands" in str(error):
+                message = "Selected region contains overlapping trace bands."
+            evaluated.append((candidate, None, unmeasured_result(message), notes, measurement_image, amplitude_calibrated))
+
+    passing = any(item[2]["status"] == "ok" for item in evaluated)
+    def rank(item):
+        candidate, recovered, result, notes, image, calibrated = item
+        good = result["status"] == "ok"
+        beats = result["quality"].get("beat_count") or 0
+        snr = result["quality"].get("snr_db")
+        preference = {"manual": 3, "long strip": 2, "row": 1, "segment": 0}[candidate.kind]
+        if passing:
+            return (good, preference, snr if snr is not None else -100, beats, candidate.box[3])
+        # Favor an available long strip/row over short cells; then the most beats.
+        return (preference > 0, beats, preference, candidate.box[3])
+    evaluated.sort(key=rank, reverse=True)
+    records = [{"kind": item[0].kind, "box": item[0].box, "beats": item[2]["quality"].get("beat_count") or 0,
+                "snr_db": item[2]["quality"].get("snr_db"), "quality": item[2]["quality"], "rank": index+1}
+               for index, item in enumerate(evaluated)]
+    candidate, recovered, result, notes, image, calibrated = evaluated[0]
+    return Selection(candidate, recovered, result, records, notes, image, calibrated)
 
 
 def ink_mask(rgb: np.ndarray) -> np.ndarray:
@@ -59,7 +209,7 @@ def detect_candidates(rgb: np.ndarray) -> list[Candidate]:
     components = []
     for label in range(1, count):
         x, y, w, h, area = map(int, stats[label])
-        if (w >= max(25, width*0.035) and 4 <= h <= height*0.35 and w >= 1.8*h
+        if (w >= max(25, width*0.035) and 4 <= h <= height*0.9 and w >= 1.8*h
                 and area >= w*0.6 and area < w*h*0.6):
             components.append((x, y, x+w, y+h, label))
     if not components:
