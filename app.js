@@ -27,7 +27,7 @@ function reportNotes(data) {
   }
   if (data.status === 'insufficient_quality') notes.push(...(data.quality?.reasons || []).map(cleanReason));
   if (resized && selectedFile) notes.push('Image resized before upload.');
-  return [...new Set(notes.map(line => String(line).trim()).filter(Boolean))];
+  return [...new Set(notes.map(line => String(line).trim()).filter(Boolean).map(line => line.replace(/[.]+$/, '')+'.'))];
 }
 
 function renderReport(data) {
@@ -47,6 +47,7 @@ function renderReport(data) {
     if (!src) return;
     const container = element('figure'), frame = element('div'), img = element('img');
     frame.className = 'image-frame'; img.src = imageSource(src); img.alt = title; frame.append(img);
+    img.addEventListener('load', () => frame.style.setProperty('--image-ratio', String(img.naturalWidth/img.naturalHeight)), { once: true });
     if (region?.box) {
       const outline = element('div'); outline.className = 'region-outline'; outline.setAttribute('aria-hidden', 'true');
       img.addEventListener('load', () => {
@@ -149,6 +150,7 @@ document.querySelector('#input-form').addEventListener('submit', async event => 
     body = new FormData(); path = '/analyze'; body.set('image', selectedFile, selectedFile.name);
     for (const [id, name] of [['pixels-per-mm', 'pixels_per_mm'], ['paper-speed', 'paper_speed'], ['gain', 'gain']]) {
       const value = document.getElementById(id).value.trim();
+      if (value && (!Number.isFinite(Number(value)) || Number(value) <= 0)) return;
       if (value) body.set(name, name === 'pixels_per_mm' ? String(Number(value) * uploadScale) : value);
     }
     const crop = document.querySelector('#crop-box').value.trim();

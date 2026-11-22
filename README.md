@@ -242,18 +242,31 @@ curl.exe -F "image=@strip.png" -F "explain=false" http://127.0.0.1:8765/analyze
 
 ## Limits and future work
 
-- Single-lead, horizontal, clean strips only. Crop twelve-lead layouts; skew,
-  glare, faint ink and overlapping traces can defeat extraction.
-- Auto calibration assumes visible 1 mm pink/red grid repeats and square paper.
+- Images are prepared and one lead region is selected automatically when Crop
+  is empty, including full 3x4, 12x1 and three-channel reports. Manual crops win.
+  Separate lead cells are not stitched. Selection favors measurement quality,
+  not clinical lead relevance. Glare, faint ink, overlapping traces, unusual
+  labels/layouts and perspective distortion can defeat extraction.
+- Preparation applies EXIF orientation, RGB/white-alpha conversion, quarter-turn
+  orientation, deskew up to 15 degrees and a 3000 px long-side limit. No perspective
+  correction or OCR. Without directional text, 180-degree orientation can be
+  ambiguous. Manual crops use EXIF-oriented upload coordinates and disable
+  automatic rotation/deskew; resizing scales crop coordinates and pixels/mm.
+- Auto calibration supports colored and faint gray grid repeats and assumes the
+  first recovered repeat is 1 mm on square paper. Major-grid-only images can
+  give the wrong scale; provide pixels/mm when calibration is uncertain.
   Paper speed / gain default to 25 mm/s / 10 mm/mV; printed values are not OCR-read.
-  Provide overrides when needed. Without a grid or manual scale, screening is blocked.
+  Without grid/manual scale, a page-width strip assumes 10 s at 25 mm/s and adds
+  that explicit Note. Amplitude range/gain are unavailable and axes use arbitrary
+  units. Other unknown time scales remain unmeasured. Automatic regions under
+  five seconds show the quality notice and unavailable HR/RR summary values.
 - No PR, QT/QTc, ST, QRS-width or axis measurement. R-event detection alone does
   not establish sinus rhythm or a clinical condition.
 - SDNN, RMSSD, pNN50 and CV describe **all detected RR**, including possible ectopy
   and errors. They are not adjudicated NN autonomic HRV; short strips limit interpretation.
 - SNR measures beat-template repeatability; varying morphology can lower it.
-  Confidence badges are heuristic, not validated disease probabilities. RR
-  irregularity alone cannot establish AFib.
+  The report UI shows measurements and input-dependent Notes, with no badges or
+  interpretation. RR irregularity alone cannot establish AFib.
 - Five MIT-BIH recordings (150.46 minutes) and twenty Gaussian-sum comparison
   images are limited engineering evidence. Clinical screening accuracy and
   photograph accuracy remain unproven; no independent patient holdout was used.
@@ -264,9 +277,17 @@ curl.exe -F "image=@strip.png" -F "explain=false" http://127.0.0.1:8765/analyze
   AD8232 hardware integration through `/analyze-signal` with mV conversion and
   appropriate handling of streaming/filter boundaries.
 
-The newly supplied local 600×333 sample works with crop `[35,224,555,294]` and
-manual 2.4 px/mm (observed HR 74.59 bpm). That scale is an assumption, not reference
-accuracy evidence. The original image is preserved and excluded from Git.
+The previous local 600×333 sample worked with manual crop `[35,224,555,294]`
+and 2.4 px/mm (observed HR 74.59 bpm); this is historical functional evidence.
+That sample and `ECG .png` are absent from the new clone. Their automatic-selection
+accuracy has not been assessed here. Supplied images are never modified.
+
+Run `python scripts/validate_layout.py` to reproduce the 32 report variants and
+process every available image in `samples/reports/`, plus those two named samples.
+Results: [layout-validation.md](results/layout-validation.md). Local outlined
+previews go to `results/layout-visual/`. Synthetic validation is engineering
+evidence, not clinical accuracy. Image responses add `region_selection` and
+`plots.prepared_image`; existing request parameters and fields remain available.
 
 ## Production deployment
 
@@ -296,9 +317,12 @@ image serves the four synthetic demos; cached MIT-BIH data stays local.
 Vercel builds the container from the Git repository, so Docker is not required
 on this Windows machine. Container Functions scale to zero after five minutes
 idle and can take longer on the first request. Vercel's request/response limit
-is 4.5 MB; the frontend caps images at 4 MB to leave room for multipart fields.
-The local API accepts images up to 10 MB. AI explanation remains optional and retains
-the existing strict-temperature and numeric-grounding checks.
+is 4.5 MB; uploads below 3.5 MB leave headroom for multipart fields.
+The report UI accepts original files up to 25 MB and resizes files above 3.5 MB
+with canvas (long side <=3000 px, JPEG quality 0.9), preserving the filename.
+It adds only the applicable resize Note. The local API limit remains 10 MB.
+The explanation API retains its strict-temperature and numeric-grounding checks;
+the report UI always sends explain=false.
 
 ```powershell
 # ECG_API_URL overrides the deployed backend default when needed.

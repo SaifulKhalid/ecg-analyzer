@@ -143,6 +143,7 @@ def select_region(rgb: np.ndarray, *, pixels_per_mm=None, paper_speed=25, gain=1
             result = analyze_signal(recovered.signal, explain=False, include_plots=False, notch_hz=notch_hz)
             if pixels_per_mm is None and spacing is not None:
                 recovered.calibration["method"] = "automatic grid autocorrelation"
+                notes.append("Automatic calibration assumes the first detected grid repeat is 1 mm; confirm the scale.")
             if not amplitude_calibrated:
                 recovered.calibration.update(gain=None, method="assumed 10 s time scale; amplitude uncalibrated")
                 result["quality"]["signal_range_mv"] = None

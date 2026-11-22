@@ -1,5 +1,25 @@
 # Automatic report-region validation
 
+Final robustness/QA supplement:
+- All 13 specified adverse image/format cases return structured responses with
+  plain Notes; eight ECG format/rotation/compression/resolution cases also meet
+  the <=3 bpm check. Tests additionally verify EXIF, white alpha flattening,
+  manual precedence, cap-8 ranking, touching lead separation, leading pulse
+  trimming and full-page overlay bounds.
+- A real public non-ECG landscape photo from https://picsum.photos/id/29/800/600
+  returns no_ecg_detected. An initial Wikimedia download was rate-limited (429);
+  the alternative source succeeded. The photo is a local ignored QA asset.
+- Browser QA at 1280/390 passes on full reports with no crop. A 17.9 MB original
+  resizes to a 1.05 MB JPEG upload with unchanged filename and the single resize
+  Note. Manual crop, short-region table/notice and blank-image flows pass.
+- Automatic regions under five seconds have null HR/RR summary values. Event
+  counts, timing lists and figures remain available with the quality notice.
+- No new dependencies, provider calls during selection, deployments, or changes
+  to the nine frozen modules. Full suite results are in PROGRESS.md.
+
+Reproduce region validation with python scripts/validate_layout.py and robustness
+with python -m pytest -q tests/test_layout.py. All declared cases follow below.
+
 Generated: 2026-11-22T21:59:23.087495+00:00.
 
 Long-strip acceptance: **27/27 (100.0%)**; required >=90% with HR error <=3 bpm.

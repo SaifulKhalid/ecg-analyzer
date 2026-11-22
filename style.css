@@ -51,6 +51,7 @@ footer { margin-top: 32px; padding-top: 14px; border-top: 1px solid #777; font-s
   main { width: 100%; max-width: none; margin: 0; }
   #input-section, button, #report-actions { display: none !important; }
   figure { break-inside: avoid; page-break-inside: avoid; }
+  .image-frame { width: min(100%, calc(215mm * var(--image-ratio, 1))); }
   table { break-inside: avoid; }
   footer { margin-top: 20px; }
 }

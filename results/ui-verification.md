@@ -2,6 +2,39 @@
 
 ## Report UI verification (2026-11-23 Asia/Dhaka)
 
+### Final Part C verification
+
+PASS: eight real browser flows against the final local API/UI. Both 1280 px and
+390 px were checked with MIT-BIH 100 and the full synthetic 3x4 report without
+any crop. Four sample figures and six image figures are numbered sequentially.
+Figure 1 uses the full prepared page with a 2 px navy CSS region outline; Figure
+6 draws a 1 px contrasting trace on that full page. Desktop and mobile images
+were visually inspected. No horizontal overflow, JavaScript exceptions, native
+browser log errors, console errors, banned DOM words, or text outside the deck.
+
+Additional verified flows:
+- 17,864,553 byte PNG original -> 1,048,886 byte JPEG upload, quality 0.9 and
+  long side <=3000 px. Filename remains large-report-original.png; explain=false;
+  the resize Note appears once. Result ok, 71.395 bpm against 72 bpm fixture HR.
+- Manual [60,720,1560,920] crop wins, retains the exact box and shows the manual Note.
+- Short report without rhythm strip shows the quality notice and full table;
+  automatic short-region HR/RR values show n/a. Notes are deduplicated.
+- Blank image shows only the required no-trace message in the result area.
+- Print media hides Input/actions, uses A4/16 mm margins and avoids figure
+  breaks. Tall image frames scale proportionally to at most 215 mm height.
+  Actual PDF export succeeds. JSON download succeeds.
+
+Artifacts: test-results/part-c-final-qa.json, part-c-final-*-dom.txt,
+part-c-final-{sample,image}-{1280,390}.png, and part-c-final-report.pdf.
+The DOM files pass rg with the banned-word expression from the request.
+Final complete tests: 155 Python / 31 Node passed, zero skips. The actual
+measurement fingerprint remains df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925.
+
+No deployment or push was performed. The named supplied images and report folder
+were absent, so those local-image checks are Blocked rather than claimed passed.
+
+### Part B checkpoint
+
 Part B: PASS. Installed Chrome, driven through tests/ui_qa.mjs using CDP; no
 additional QA or runtime dependency. Actual requests go through Node :3000 to
 the local FastAPI service :8765. The UI always sends explain=false.

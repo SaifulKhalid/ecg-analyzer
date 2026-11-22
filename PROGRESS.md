@@ -35,18 +35,22 @@ Decisions:
 | Part B | PASS | 16 minutes; full 113 Python / 31 Node tests; 1280/390 record/image QA, DOM deck/banned audit, print hiding, 200 dpi/red-marker tests pass |
 | Part C P1 detection/generator | PASS | 11 minutes; 32 declared variants; 16 candidate/orientation/noise tests pass; JPEG/grid-crossing correction made only in new files |
 | Part C P2 scoring/API | PASS | 13 minutes; cap-8 scoring, manual precedence, no-grid/time-only handling; seven selection tests, two legacy image API checks, 105 bpm API, full-report 1280/390 browser flows pass |
-| Part C P3 robustness | PASS | 22 minutes; final 32 variants: 27/27 long strips <=3 bpm, 5/5 graceful short/uncalibrated; 13 format/adverse-image plus EXIF/alpha/hash checks; touching-lead/pulse/overlay regressions pass |
-| Part C P4 UI/docs/final QA | Active | Started 22:05 UTC; 15 minute maximum |
+| Part C P3 robustness | PASS | 26 minutes through commit; final 32 variants: 27/27 long strips <=3 bpm, 5/5 graceful short/uncalibrated; 13 format/adverse-image plus EXIF/alpha/hash checks; touching-lead/pulse/overlay regressions pass |
+| Part C P4 UI/docs/final QA | PASS | About 35 minutes; 155 Python / 31 Node pass, exact fingerprint matches, eight final CDP flows and DOM/print/copy audits pass; used unused C time, total C about 83 minutes and run about 100 minutes |
 
 Definition of Done:
 - [x] Part A: environment works; pytest/npm test pass; fingerprint matches.
 - [x] Part B: report UI done; results/ui-verification.md written; DOM grep clean.
 - [x] Part C: full synthetic report works with no crop; layout-validation.md exists.
-- [ ] Full final pytest/npm test pass; frozen fingerprint unchanged.
-- [ ] Final report: files, run commands, results, assumptions, blocked items, limits.
+- [x] Full final pytest/npm test pass; frozen fingerprint unchanged.
+- [x] Final report: files, run commands, results, assumptions, blocked items, limits.
 
 Blocked:
-- None currently. The initial UI browser attempt had no listening backend after
+- Supplied-image checks: sample_ECG_image.png, ECG .png and samples/reports/ are
+  absent from this clone and D:/ECG, including ignored/tracked-path searches.
+- Push: the noninteractive existing Git credential-manager check found no
+  cached credentials. No push, authentication dialog, force push or deployment.
+- Resolved: the initial UI browser attempt had no listening backend after
   a detached launch. A direct normal API process fixed it. The next copy audit
   needed to tokenize table tabs; corrected the QA harness. A subsequent image
   check exposed blob URLs blocked by the existing CSP; switched the UI to data
@@ -90,6 +94,123 @@ Blocked local-input checks: sample_ECG_image.png, ECG .png and samples/reports/
 are absent. Checked exact workspace paths, searched D:/ECG including ignored
 files, and checked tracked Git paths; the ignored supplied images were not
 included in this clone. No input was fabricated or overwritten to claim a pass.
+
+## Final report for Parts A/B/C (2026-11-23 Asia/Dhaka)
+
+Part A PASS; Part B PASS; Part C PASS on the declared synthetic report validation.
+The specified supplied-image checks are Blocked because those files are absent.
+No deployment was performed. No nine-file fingerprint content changed.
+
+Files and commits:
+- A, 0985a72: .gitattributes, package.json/package-lock.json Node minimum,
+  README setup version, PROGRESS.md, results/setup-verification.md. Local
+  portable Python/Node, .venv, dependencies and MIT-BIH data are not committed.
+- B, 4a2183b: index.html, app.js, style.css, ecg/api.py, new ecg/report_plots.py,
+  README UI description, tests/test_report_plots.py, tests/ui_qa.mjs,
+  results/ui-verification.md and PROGRESS.md.
+- C P1, 009c627: new ecg/imageprep.py, ecg/layout.py, tests/report_synth.py,
+  tests/test_layout.py and progress.
+- C P2, 43fb117: API wiring, layout scoring, report overlay/uncalibrated units,
+  tests, new scripts/validate_layout.py and progress.
+- C P3, c99c7e2: layout text cleanup/short-region safety, touching-lead fixtures,
+  one-pixel full-page overlay, robustness tests, results/layout-validation.md
+  and .json, and progress.
+- C P4: copy/print/resizing QA, README limits and UI upload description, final
+  verification reports and this report; committed locally after final checks.
+
+Implemented selection strategy:
+1. Apply EXIF orientation, flatten alpha on white and convert to RGB. Infer
+   quarter turns using horizontal trace continuity plus header-text position;
+   deskew up to 15 degrees; downscale long side to 3000 px. No perspective/OCR.
+2. Mask dark mostly neutral ink, keeping dark colored-grid crossings. Retain
+   long thin components and group horizontal bands using row-projection valleys.
+   Disjoint cells stay separate; repeated label positions split touching lead
+   rows. Strip widths >=85% of the page are long strips, >=50% partial row strips,
+   otherwise segments. Leading square calibration pulses are trimmed.
+3. Give each single lead 30 mm of paper context bounded by neighboring valleys;
+   remove small label ink only in the measurement image. Preserve the full
+   prepared page for display. Evaluate at most eight regions through the
+   unchanged digitizer, preprocessing, peaks and quality pipeline with no provider.
+4. Passing regions prefer long strip, then row, then segment, higher SNR,
+   more beats and bottom-most. With no passing region, prefer the available
+   long/row strip with most beats. Short automatic regions have a quality
+   notice and null HR/RR summaries. No detected cells are stitched.
+5. Manual crop wins and bypasses automatic layout/orientation; EXIF conversion
+   still applies and resizing scales its coordinates/manual pixels per mm.
+6. Without grid/manual scale, only a page-width strip at default 25 mm/s gets
+   the explicit 10 s width assumption. Amplitude range/gain are null, axes use
+   arbitrary units, and the exact time/amplitude Note is shown. Otherwise time
+   is unmeasured. No trace returns no_ecg_detected and a plain Note.
+
+Validation:
+- 32 declared variants: 27/27 long-strip selections/HR checks (100%, required
+  >=90%); maximum HR error 0.470 bpm. Five short/uncalibrated layouts fail
+  gracefully with accurate Notes and unavailable rate summaries.
+- All 13 adverse/format cases and EXIF/alpha, cap-8, manual, touching-lead,
+  calibration-pulse and overlay checks pass. A real public landscape photo also
+  returns no_ecg_detected. No server error in these cases.
+- Eight real Chrome flows: 1280/390 records and full report with no crop;
+  large resize, short quality/table, manual crop and blank input. Zero console
+  or native log errors; no horizontal overflow; DOM copy/deck and banned grep
+  clean; real JSON download and A4 PDF export work. Mobile/desktop visually checked.
+- Original 17,864,553 byte file uploads as 1,048,886 byte quality-0.9 JPEG,
+  same filename, <=3000 px, explain=false, one resize Note, 71.395 bpm.
+- Final complete tests: 155 Python passed in 449.36 s, 31 Node passed, no skips;
+  only 14 upstream Matplotlib/PyParsing deprecation warnings. Full suites were
+  repeated after the last functional changes and passed again.
+- Final actual scripts.compare_holdout.measurement_fingerprint() equals
+  df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925.
+  The original manifest and all nine frozen files remain unchanged.
+
+Run locally in two terminals (new terminals receive the user PATH from Part A):
+```powershell
+.\.venv\Scripts\python.exe -m ecg.api
+npm start
+```
+Open http://localhost:3000, select a record or image, Analyze. Leave Crop empty
+for automatic selection. Credentials are optional: create .env from .env.example
+only when wanted; the UI always sends explain=false. Local backend remains on
+127.0.0.1:8765 with ECG_LLM_ENABLED=0; normal frontend is on port 3000.
+
+Reproduce:
+```powershell
+.\.venv\Scripts\python.exe scripts/validate_layout.py
+.\.venv\Scripts\python.exe -m pytest -q
+npm test
+```
+The new browser QA uses installed Chrome CDP port 9223 and tests/ui_qa.mjs;
+artifacts are ignored under test-results/. No runtime dependency was added.
+
+Assumptions/known failure cases:
+- Engineering synthetic/round-trip evidence is not clinical image accuracy.
+  Lead choice reflects signal quality, not clinical relevance. Missing/faint
+  labels, unusual layouts, joined ink, glare, overlapping traces, heavy noise
+  and perspective/nonuniform scaling can defeat selection.
+- Auto grid calibration assumes minor 1 mm repeats; a major-only grid can
+  miscalibrate. No-grid width assumes ten seconds at 25 mm/s and can be wrong
+  for a different recording duration. Supply calibration when known.
+- Text-free images can have ambiguous 180-degree orientation. Manual crop
+  coordinates must refer to the EXIF-oriented upload; automatic rotation and
+  deskew are disabled for manual crops to preserve that choice.
+- Printed speed/gain/lead names are not OCR-read. Small/uncalibrated regions
+  remain qualified or unmeasured; no PR/QT/ST/QRS-width/axis measurement added.
+- Unsupported/corrupt formats or invalid calibration/crop return structured
+  422 errors; valid tested adverse images return structured Notes, never 500.
+- Supplied local samples and reports directory are absent; no automatic
+  selection or accuracy claims for them. No cached Git credentials; local
+  commits only. A Wikimedia photo fetch was rate-limited; alternate public
+  source succeeded without changing system settings.
+
+Redeploy later (instructions only; none of these actions were executed):
+1. Publish the local commits when ready and redeploy the Vercel Container preset
+   using Dockerfile.vercel, preserving the existing backend environment. Verify
+   its HTTPS /health and a full-report /analyze request with explain=false.
+2. Then build/deploy the Cloudflare Worker against that backend URL:
+```powershell
+$env:ECG_API_URL = 'https://ecg-analyzer-dsp-khalid-saifullahs-projects-239e324e.vercel.app'
+npm run build
+npm.cmd exec --yes --package=node@22.23.0 -c "cf deploy --prebuilt"
+```
 
 ## New-laptop setup and report UI request (2026-11-23 Asia/Dhaka)
 
