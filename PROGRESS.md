@@ -18,8 +18,8 @@ permitted helper second opinion.
 | 4 Image digitizer | 75 min | Complete | 30 min | 18 image tests, 14-case round-trip gate, actual browser multipart upload pass |
 | 5 GPT comparison | 25 min | Complete | 20.3 min | 10 paired real GPT replies; HR MAE 0.00823 vs 0.02047; categorical accuracy ties at 100% |
 | 6 Wrap + checks | 5 min | Complete | 4.3 min | 62 Python + 27 Node tests; build / live UI / data-secret audit pass; README complete |
-| 7 Fresh synthetic validation | 15 min | In progress | 4 min | Continuation 12:50 UTC; predeclared unused parameters / seeds, DSP frozen |
-| 8 Optional provider compatibility | 15 min | Pending | 0 | Strict temperature 0.2 remains default; explicit opt-in only |
+| 7 Fresh synthetic validation | 15 min | Complete | 11 min | 10/10 fresh GPT replies; frozen DSP HR MAE 0.01551 vs 0.19436 bpm |
+| 8 Optional provider compatibility | 15 min | In progress | 0 | Start 13:01 UTC; strict temperature 0.2 remains default, explicit opt-in only |
 | 9 Continuation wrap | 5 min | Pending | 0 | Checks, docs / results and final commits before 13:33:48 UTC |
 
 ## Recon and assumptions
@@ -220,3 +220,13 @@ temperature 0.2, so explanation can remain null while measured results work.
   fallback must be requested and transparently identified in the response / UI.
 - Generated PNGs remain ignored; cases, scalar results and protocol hashes are
   reviewable artifacts. No original GPT result will be overwritten or selected by error.
+- 12:56:33 UTC — Prepared the unused synthetic case manifest and committed it
+  as `b38df6f` before live requests. Uniform HR 45–130 bpm, independently seeded
+  noise / hum / drift, two irregular and two inverted strips. Measurement
+  modules frozen at `df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925`.
+- 13:01 UTC — All ten fresh GPT image-only predictions returned. Frozen DSP
+  HR MAE 0.01551 bpm versus GPT 0.19436 bpm (92.0% lower), with 10/10 coverage.
+  Both methods 100% for ±3 bpm and RR timing labels. No post-result changes to
+  measurement code or case selection. This adds fresh synthetic evidence;
+  clinical / photo accuracy still is not established. Added manifest immutability
+  and changed-code rejection checks. Original comparison artifacts remain intact.

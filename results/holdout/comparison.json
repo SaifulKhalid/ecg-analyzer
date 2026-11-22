@@ -1,0 +1,763 @@
+{
+  "generated_utc": "2026-11-22T12:58:23.369144+00:00",
+  "code_fingerprint": "df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925",
+  "gpt_protocol_fingerprint": "a95a23cc81ee17aa297bff34acc6e901dbaa35f985a6ae1df88a1a1a32d9e2fa",
+  "seed": 20261123,
+  "duration_seconds": 12.0,
+  "gpt_input": "same image only; printed calibration; model default temperature",
+  "pipeline_input": "same image -> auto digitization -> own DSP; LLM explanation disabled",
+  "truth_definition": "60 / mean RR between simulator R events; rhythm is regular/irregular timing only",
+  "metrics": {
+    "case_count": 10,
+    "gpt_hr_coverage": 10,
+    "pipeline_hr_coverage": 10,
+    "paired_count": 10,
+    "gpt_paired_hr_mae_bpm": 0.19436266871144098,
+    "pipeline_paired_hr_mae_bpm": 0.015510134341801063,
+    "pipeline_all_hr_mae_bpm": 0.015510134341801063,
+    "gpt_all_hr_mae_bpm": 0.19436266871144098,
+    "gpt_hr_within_3_bpm_count": 10,
+    "pipeline_hr_within_3_bpm_count": 10,
+    "gpt_rhythm_correct_count": 10,
+    "pipeline_rhythm_correct_count": 10,
+    "gpt_rhythm_accuracy_percent": 100.0,
+    "pipeline_rhythm_accuracy_percent": 100.0,
+    "pipeline_beats_gpt_hr_mae": true
+  },
+  "cases": [
+    {
+      "case_id": "holdout_01",
+      "parameters": {
+        "hr": 48.75,
+        "noise": 0.0961,
+        "mains_amplitude": 0.1126,
+        "baseline_wander": 0.1703,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261123
+      },
+      "truth": {
+        "heart_rate_bpm": 48.75406283856989,
+        "rhythm": "regular",
+        "beat_count": 10
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 48.772,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 10,
+          "snr_db": 15.0,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1091
+        },
+        "calibration": {
+          "pixels_per_mm": 8.0001,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 8.000145879233543,
+          "grid_spacing_y_px": 7.988186254266068,
+          "native_columns_per_second": 200.004,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            316
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 49,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 8952
+      },
+      "image_sha256": "a7d2c45885858b9779a2e728c039ca82fa0f9116df8b414761ff207249b10c03",
+      "pipeline_absolute_hr_error": 0.017937161430111814,
+      "gpt_absolute_hr_error": 0.24593716143011335
+    },
+    {
+      "case_id": "holdout_02",
+      "parameters": {
+        "hr": 65.12,
+        "noise": 0.0941,
+        "mains_amplitude": 0.1627,
+        "baseline_wander": 0.1333,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261124
+      },
+      "truth": {
+        "heart_rate_bpm": 65.12301013024603,
+        "rhythm": "regular",
+        "beat_count": 13
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 65.123,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 13,
+          "snr_db": 16.53,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1497
+        },
+        "calibration": {
+          "pixels_per_mm": 8.0001,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 8.000091063832334,
+          "grid_spacing_y_px": 7.999873751188133,
+          "native_columns_per_second": 200.002,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            308
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 65,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 9592
+      },
+      "image_sha256": "ee8915b3b1c0786ab3777fcd7fc5ea75c11487cd1250ba7cb27f23e03964452c",
+      "pipeline_absolute_hr_error": 1.0130246025141787e-05,
+      "gpt_absolute_hr_error": 0.1230101302460298
+    },
+    {
+      "case_id": "holdout_03",
+      "parameters": {
+        "hr": 50.6,
+        "noise": 0.0986,
+        "mains_amplitude": 0.0338,
+        "baseline_wander": 0.2323,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261125
+      },
+      "truth": {
+        "heart_rate_bpm": 50.59970014992505,
+        "rhythm": "regular",
+        "beat_count": 10
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 50.619,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 10,
+          "snr_db": 16.24,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1114
+        },
+        "calibration": {
+          "pixels_per_mm": 8.0002,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 8.000231812878091,
+          "grid_spacing_y_px": 8.000008138154529,
+          "native_columns_per_second": 200.006,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            308
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 50.6,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 12557
+      },
+      "image_sha256": "db69418dc1b29c395fa5f2ffe35c8b90aee82e27121ac78ba7bceac477493989",
+      "pipeline_absolute_hr_error": 0.019299850074951053,
+      "gpt_absolute_hr_error": 0.0002998500749527011
+    },
+    {
+      "case_id": "holdout_04",
+      "parameters": {
+        "hr": 81.8,
+        "noise": 0.0221,
+        "mains_amplitude": 0.0354,
+        "baseline_wander": 0.1183,
+        "irregular": true,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261126
+      },
+      "truth": {
+        "heart_rate_bpm": 83.1792975970425,
+        "rhythm": "irregular",
+        "beat_count": 16
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 83.179,
+        "rhythm": "irregular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 16,
+          "snr_db": 29.64,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1471
+        },
+        "calibration": {
+          "pixels_per_mm": 7.9999,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 7.999941774324121,
+          "grid_spacing_y_px": 7.994308941561493,
+          "native_columns_per_second": 199.999,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            284
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 83,
+        "rhythm": "irregular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 8624
+      },
+      "image_sha256": "8a2aef85d5dd9df18fd6e17652f15a1fc4545032d0af1045d1d44d8e5582058a",
+      "pipeline_absolute_hr_error": 0.00029759704250409413,
+      "gpt_absolute_hr_error": 0.17929759704250614
+    },
+    {
+      "case_id": "holdout_05",
+      "parameters": {
+        "hr": 107.19,
+        "noise": 0.0701,
+        "mains_amplitude": 0.1951,
+        "baseline_wander": 0.2319,
+        "irregular": false,
+        "invert": true,
+        "duration": 12.0,
+        "seed": 20261127
+      },
+      "truth": {
+        "heart_rate_bpm": 107.18315156073709,
+        "rhythm": "regular",
+        "beat_count": 20
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 107.223,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 20,
+          "snr_db": 17.13,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1936
+        },
+        "calibration": {
+          "pixels_per_mm": 7.9999,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 7.999935272276534,
+          "grid_spacing_y_px": 8.000022097928133,
+          "native_columns_per_second": 199.998,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            340
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 107,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 10406
+      },
+      "image_sha256": "7b50c9b787063d4f3f4c3d6155d3afbd7d542294ff274beff1c778c122bfd698",
+      "pipeline_absolute_hr_error": 0.039848439262911484,
+      "gpt_absolute_hr_error": 0.1831515607370875
+    },
+    {
+      "case_id": "holdout_06",
+      "parameters": {
+        "hr": 88.88,
+        "noise": 0.0195,
+        "mains_amplitude": 0.1988,
+        "baseline_wander": 0.1203,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261128
+      },
+      "truth": {
+        "heart_rate_bpm": 88.88888888888889,
+        "rhythm": "regular",
+        "beat_count": 17
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 88.856,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 17,
+          "snr_db": 29.23,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1633
+        },
+        "calibration": {
+          "pixels_per_mm": 7.9997,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 7.999696849962445,
+          "grid_spacing_y_px": 8.000282851757065,
+          "native_columns_per_second": 199.992,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            292
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 89,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 8552
+      },
+      "image_sha256": "b0a1b00c9d8c8f9ce72e52451202a8be3cdd94635e7bf283cd7ad9c7e51427f7",
+      "pipeline_absolute_hr_error": 0.03288888888889119,
+      "gpt_absolute_hr_error": 0.11111111111111427
+    },
+    {
+      "case_id": "holdout_07",
+      "parameters": {
+        "hr": 90.26,
+        "noise": 0.0337,
+        "mains_amplitude": 0.0562,
+        "baseline_wander": 0.1498,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261129
+      },
+      "truth": {
+        "heart_rate_bpm": 90.25949605114704,
+        "rhythm": "regular",
+        "beat_count": 17
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 90.259,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 17,
+          "snr_db": 25.9,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.1572
+        },
+        "calibration": {
+          "pixels_per_mm": 7.9999,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 7.999857151633513,
+          "grid_spacing_y_px": 7.99978809047792,
+          "native_columns_per_second": 199.996,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            292
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 90,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 5859
+      },
+      "image_sha256": "02c03071f0a5f21b4ac0befea04135c243c521d858045e285ad76e6b4d73a33b",
+      "pipeline_absolute_hr_error": 0.0004960511470386564,
+      "gpt_absolute_hr_error": 0.259496051147039
+    },
+    {
+      "case_id": "holdout_08",
+      "parameters": {
+        "hr": 51.65,
+        "noise": 0.018,
+        "mains_amplitude": 0.0216,
+        "baseline_wander": 0.2427,
+        "irregular": false,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261130
+      },
+      "truth": {
+        "heart_rate_bpm": 51.64498852333588,
+        "rhythm": "regular",
+        "beat_count": 10
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 51.645,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 10,
+          "snr_db": 32.25,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.0878
+        },
+        "calibration": {
+          "pixels_per_mm": 7.9998,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 7.999843504614411,
+          "grid_spacing_y_px": 7.988685406084041,
+          "native_columns_per_second": 199.996,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            300
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 52,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 6666
+      },
+      "image_sha256": "5ff8f4364c4f9430a3e09faca9c9a0df07f0169de57850d70e9a79df2031ee8d",
+      "pipeline_absolute_hr_error": 1.1476664120380065e-05,
+      "gpt_absolute_hr_error": 0.35501147666411725
+    },
+    {
+      "case_id": "holdout_09",
+      "parameters": {
+        "hr": 116.91,
+        "noise": 0.0772,
+        "mains_amplitude": 0.1665,
+        "baseline_wander": 0.0428,
+        "irregular": true,
+        "invert": false,
+        "duration": 12.0,
+        "seed": 20261131
+      },
+      "truth": {
+        "heart_rate_bpm": 118.42105263157892,
+        "rhythm": "irregular",
+        "beat_count": 22
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 118.377,
+        "rhythm": "irregular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 22,
+          "snr_db": 14.29,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.2129
+        },
+        "calibration": {
+          "pixels_per_mm": 7.9998,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 7.9998373288419895,
+          "grid_spacing_y_px": 8.000013365134592,
+          "native_columns_per_second": 199.996,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            308
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 118,
+        "rhythm": "irregular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 15319
+      },
+      "image_sha256": "f1f44162e54942f1a2c67646be361d0675d565e7cdc8222e90573fe13ca2a1eb",
+      "pipeline_absolute_hr_error": 0.044052631578921364,
+      "gpt_absolute_hr_error": 0.4210526315789167
+    },
+    {
+      "case_id": "holdout_10",
+      "parameters": {
+        "hr": 46.06,
+        "noise": 0.0303,
+        "mains_amplitude": 0.1756,
+        "baseline_wander": 0.2452,
+        "irregular": false,
+        "invert": true,
+        "duration": 12.0,
+        "seed": 20261132
+      },
+      "truth": {
+        "heart_rate_bpm": 46.06525911708253,
+        "rhythm": "regular",
+        "beat_count": 9
+      },
+      "pipeline": {
+        "status": "ok",
+        "heart_rate_bpm": 46.065,
+        "rhythm": "regular",
+        "quality": {
+          "status": "ok",
+          "reasons": [],
+          "beat_count": 9,
+          "snr_db": 26.27,
+          "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+          "rr_plausible_fraction": 1.0,
+          "signal_range_mv": 1.0837
+        },
+        "calibration": {
+          "pixels_per_mm": 8.0001,
+          "paper_speed": 25.0,
+          "gain": 10.0,
+          "method": "automatic pink/red grid autocorrelation",
+          "grid_spacing_x_px": 8.000050303205258,
+          "grid_spacing_y_px": 7.989702421647756,
+          "native_columns_per_second": 200.001,
+          "crop_box": [
+            0,
+            28,
+            2400,
+            332
+          ]
+        }
+      },
+      "gpt": {
+        "status": "ok",
+        "heart_rate_bpm": 46,
+        "rhythm": "regular",
+        "model": "gpt-5.6-sol",
+        "attempts": 1,
+        "duration_ms": 6740
+      },
+      "image_sha256": "b813038fa953b00dbe021b0618237c5c76e8e40b458e152900a5c6cf32d47c4e",
+      "pipeline_absolute_hr_error": 0.00025911708253545385,
+      "gpt_absolute_hr_error": 0.06525911708253318
+    }
+  ],
+  "manifest_sha256": "7f58383e2fc48a3ea9838bc1890d765ed06052eb4434c6429aae46f2fad6791a",
+  "manifest": {
+    "prepared_utc": "2026-11-22T12:56:33.259894+00:00",
+    "seed": 20261123,
+    "prepared_git_commit": "af1c2805c944cfc5222d76eb1ce5ec8821fa21ef",
+    "measurement_fingerprint": "df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925",
+    "measurement_files": [
+      "config",
+      "preprocess",
+      "peaks",
+      "features",
+      "classify",
+      "quality",
+      "digitize",
+      "plots",
+      "synth"
+    ],
+    "sampling": "HR uniformly drawn from 45\u2013130 bpm; all cases / noise / timing / polarity fixed before GPT requests.",
+    "cases": [
+      {
+        "case_id": "holdout_01",
+        "parameters": {
+          "hr": 48.75,
+          "noise": 0.0961,
+          "mains_amplitude": 0.1126,
+          "baseline_wander": 0.1703,
+          "irregular": false,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261123
+        }
+      },
+      {
+        "case_id": "holdout_02",
+        "parameters": {
+          "hr": 65.12,
+          "noise": 0.0941,
+          "mains_amplitude": 0.1627,
+          "baseline_wander": 0.1333,
+          "irregular": false,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261124
+        }
+      },
+      {
+        "case_id": "holdout_03",
+        "parameters": {
+          "hr": 50.6,
+          "noise": 0.0986,
+          "mains_amplitude": 0.0338,
+          "baseline_wander": 0.2323,
+          "irregular": false,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261125
+        }
+      },
+      {
+        "case_id": "holdout_04",
+        "parameters": {
+          "hr": 81.8,
+          "noise": 0.0221,
+          "mains_amplitude": 0.0354,
+          "baseline_wander": 0.1183,
+          "irregular": true,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261126
+        }
+      },
+      {
+        "case_id": "holdout_05",
+        "parameters": {
+          "hr": 107.19,
+          "noise": 0.0701,
+          "mains_amplitude": 0.1951,
+          "baseline_wander": 0.2319,
+          "irregular": false,
+          "invert": true,
+          "duration": 12.0,
+          "seed": 20261127
+        }
+      },
+      {
+        "case_id": "holdout_06",
+        "parameters": {
+          "hr": 88.88,
+          "noise": 0.0195,
+          "mains_amplitude": 0.1988,
+          "baseline_wander": 0.1203,
+          "irregular": false,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261128
+        }
+      },
+      {
+        "case_id": "holdout_07",
+        "parameters": {
+          "hr": 90.26,
+          "noise": 0.0337,
+          "mains_amplitude": 0.0562,
+          "baseline_wander": 0.1498,
+          "irregular": false,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261129
+        }
+      },
+      {
+        "case_id": "holdout_08",
+        "parameters": {
+          "hr": 51.65,
+          "noise": 0.018,
+          "mains_amplitude": 0.0216,
+          "baseline_wander": 0.2427,
+          "irregular": false,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261130
+        }
+      },
+      {
+        "case_id": "holdout_09",
+        "parameters": {
+          "hr": 116.91,
+          "noise": 0.0772,
+          "mains_amplitude": 0.1665,
+          "baseline_wander": 0.0428,
+          "irregular": true,
+          "invert": false,
+          "duration": 12.0,
+          "seed": 20261131
+        }
+      },
+      {
+        "case_id": "holdout_10",
+        "parameters": {
+          "hr": 46.06,
+          "noise": 0.0303,
+          "mains_amplitude": 0.1756,
+          "baseline_wander": 0.2452,
+          "irregular": false,
+          "invert": true,
+          "duration": 12.0,
+          "seed": 20261132
+        }
+      }
+    ],
+    "training": "none"
+  },
+  "measurement_code_unchanged": true,
+  "study": "Fresh synthetic validation; cases declared and measurement code frozen before GPT predictions."
+}
