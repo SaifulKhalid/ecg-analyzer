@@ -36,6 +36,8 @@ def analyze_signal(signal: Signal, *, explain: bool = True, include_plots: bool 
         explanation = report.explain_measurements(result, allow_provider_default_temperature=True) if allow_provider_default_temperature else report.explain_measurements(result)
         result["explanation"] = explanation["explanation"]
         result["explanation_error"] = explanation.get("error")
+        if explanation.get("explanation_grounding"):
+            result["explanation_grounding"] = explanation["explanation_grounding"]
         if explanation.get("error"):
             result["warnings"].append(explanation["error"])
         if explanation.get("model"):

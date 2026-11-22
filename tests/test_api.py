@@ -3,6 +3,25 @@ import pytest
 import base64
 
 from ecg.synth import generate_ecg
+from ecg.report import explain_measurements as real_explain_measurements
+from ecg.grounding import SECTIONS
+
+
+def test_grounding_failure_preserves_api_measurements(api_client, monkeypatch):
+    from ecg import report
+
+    request, _ = api_client
+    monkeypatch.delenv("ECG_LLM_ENABLED", raising=False)
+    monkeypatch.setattr(report, "explain_measurements", real_explain_measurements)
+    monkeypatch.setattr(report, "call_bridge", lambda request: {"status_code": 200,
+        "report": {"explanation": {section: "Mean HR 140 bpm." if section == "Summary"
+                                   else "Clinician review is advised." for section in SECTIONS}}})
+    code, result = request("/analyze-signal", {"sample_id": "synth-regular"})
+    assert code == 200 and result["status"] == "ok"
+    assert abs(result["measurements"]["hr_mean_bpm"] - 72) < 1
+    assert result["explanation"] is None
+    assert result["explanation_grounding"]["status"] == "rejected"
+    assert any("Measured results are preserved" in note for note in result["warnings"])
 
 
 def test_health_catalog_and_demo_flow(api_client):

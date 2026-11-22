@@ -24,8 +24,8 @@ permitted helper second opinion.
 | 9 Continuation wrap | 5 min | Complete | 3.7 min | 67 Python + 30 Node tests, build / UI / audits pass; original results preserved |
 | 10 Final reporting audit | 5 min | Complete | 4.6 min development | Legacy / missing initial metadata fixed; 69 tests pass; final log retrieval passed original deadline |
 | 11 Longer MIT-BIH validation | 25 min | Complete | 2.6 min | 150.46 minutes; macro sensitivity 99.47%, PPV 99.94%; 6 boundary tests pass |
-| 12 Explanation grounding | 30 min | In progress | 0 | Reject unsupported numeric claims; measured JSON only; mocked tests |
-| 13 Documentation / live QA | 20 min | Pending | 0 | Preserve original results, document wider validation / grounding, check UI / API |
+| 12 Explanation grounding | 30 min | Complete | 14 min resumed | Typed / labeled numbers, report-only definitions, mocked failures; live guarded five-section response |
+| 13 Documentation / live QA | 20 min | In progress | 0 | Preserve original results, document wider validation / grounding, check UI / API |
 | 14 Extended wrap | 5 min | Pending | 0 | Final tests, commits and audits before 15:33:48 UTC |
 
 ## Recon and assumptions
@@ -75,6 +75,10 @@ permitted helper second opinion.
 - Existing Node 22.14 runs the local server but cannot load the installed
   Cloudflare plugin's TypeScript config (requires 22.18+). Use isolated cached
   Node 22.18 for the build; correct package engine and README requirements.
+- Numeric prose grounding is conservative: checks cover explicit numerals,
+  metric labels, unit conversions and displayed rounding; they do not prove
+  all medical language is correct or check written-out numbers. Unsupported
+  phrasing can return null explanation while measurements remain available.
 - A new `sample_ECG_image.png` appeared during work: 600×333, twelve-lead layout
   with a bottom rhythm strip. Treat it as user input, preserve it, and exclude
   it from Git. Whole multi-lead images need an explicit single-lead crop.
@@ -293,3 +297,24 @@ temperature 0.2, so explanation can remain null while measured results work.
   Save separate long-validation artifacts, including every unmatched timestamp.
   No detector changes, interval selection, dataset training or additional GPT calls.
   Phase 11 completed under its 25-minute ceiling; begin report-layer grounding.
+- 16:24:36 UTC — A user interruption and the subsequent idle interval carried
+  the wall clock beyond the extended 15:33:48 UTC target. The latest explicit
+  `Continue` is treated as authorization to finish the already planned report
+  grounding, documentation and final checks. Preserve the original deadlines;
+  do not silently reset them or add feature scope. Restart the unimplemented
+  phase-12 active-work box (30 minutes), then bounded QA / wrap. No questions.
+- 16:36:12 UTC — Two bounded synthetic live explanation requests through actual
+  Node -> FastAPI -> AgentRouter: the first reply had an unsupported numeric
+  claim in Limitations and was rejected; the exact token is unknown because the
+  rejected prose was not retained. Preserve its null-response / measured-values
+  artifact as `grounding-rejected.json`. The second reply passed 14 numeric
+  checks and all five sections; save `grounded-explanation.json`. No change to
+  the guard was used between these two requests to force a pass. A temporary
+  local QA observer captured only the second synthetic reply in an ignored file.
+- Phase 12 adds `grounding.py`, report-only config definitions, named metric /
+  compatible-unit / rounding checks, unavailable-waveform / definite-condition
+  guards, and API grounding provenance. All original API measurements are
+  preserved; no image / samples reach GPT. Forty-five targeted tests passed
+  after the final label refinements (four unrelated tests deselected); 30 Node
+  tests passed. Frozen measurement fingerprint still matches the predeclared
+  fresh-study protocol. Restore normal API startup before final browser checks.

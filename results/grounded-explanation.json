@@ -1,0 +1,116 @@
+{
+  "status": "ok",
+  "quality": {
+    "status": "ok",
+    "reasons": [],
+    "beat_count": 14,
+    "snr_db": 30.35,
+    "snr_method": "Median aligned QRS template / beat-to-template residual (heuristic).",
+    "rr_plausible_fraction": 1.0,
+    "signal_range_mv": 1.173
+  },
+  "measurements": {
+    "fs_hz": 250.0,
+    "duration_s": 12.0,
+    "beat_count": 14,
+    "hr_mean_bpm": 72.009,
+    "hr_min_bpm": 71.77,
+    "hr_max_bpm": 72.115,
+    "mean_rr_ms": 833.231,
+    "sdnn_ms": 1.922,
+    "rmssd_ms": 3.266,
+    "pnn50_percent": 0.0,
+    "rr_cv": 0.0023,
+    "rr_intervals_ms": [
+      832.0,
+      836.0,
+      832.0,
+      832.0,
+      836.0,
+      832.0,
+      832.0,
+      836.0,
+      832.0,
+      832.0,
+      836.0,
+      832.0,
+      832.0
+    ],
+    "r_peak_times_s": [
+      0.5,
+      1.332,
+      2.168,
+      3.0,
+      3.832,
+      4.668,
+      5.5,
+      6.332,
+      7.168,
+      8.0,
+      8.832,
+      9.668,
+      10.5,
+      11.332
+    ],
+    "variability_note": "Descriptive RR variability includes all detected beats; not adjudicated NN HRV."
+  },
+  "findings": [
+    {
+      "label": "Suggestive of regular RR timing within the screened rate range",
+      "confidence": 0.75,
+      "evidence": [
+        "Mean HR 72.0 bpm; RR coefficient of variation 0.002.",
+        "Regular RR timing does not establish a sinus rhythm or exclude a condition."
+      ]
+    }
+  ],
+  "explanation": {
+    "Summary": "This 12-second, single-lead educational screen detected 14 beats. Mean heart rate was 72.009 bpm, with minimum heart rate 71.77 bpm and maximum heart rate 72.115 bpm. The result suggests regular RR timing within the screened rate range; it is not a diagnosis. Educational screening tool, not a medical device.",
+    "What the numbers mean": "Mean RR interval was 833.231 ms. RR SDNN was 1.922 ms, RMSSD was 3.266 ms, pNN50 was 0% using the defined 50 ms difference cutoff, and RR coefficient of variation was 0.0023 (unitless). These descriptive variability measures include all detected beats and are not adjudicated normal-to-normal HRV.",
+    "Possible findings": "The supplied finding is suggestive of regular RR timing. Its confidence value of 0.75 (unitless) is heuristic, not a validated disease probability. Regular timing does not establish sinus rhythm or exclude a condition. RR irregularity alone cannot establish AFib.",
+    "Limitations": "The automated quality status was ok, with heuristic SNR 30.35 dB. This short, single-lead strip supports only rate and RR screening; PR, QT, ST, QRS width, axis, and morphology were not assessed. Filtering may distort the first and last 0.5 seconds. Ectopy or detection errors may affect results. No ECG image was supplied, so image calibration cannot be checked.",
+    "When to see a doctor": "Have a clinician review this screening result, especially if symptoms or concerns persist. Seek urgent care for chest pain, fainting, or severe shortness of breath."
+  },
+  "warnings": [
+    "Filtering may distort the first and last 0.5 seconds of a short strip.",
+    "Single-lead rate and RR screening only; no PR/QT/ST/QRS-width or axis measurement.",
+    "Finding confidence is heuristic, not a validated disease probability.",
+    "Short-strip RR variability includes possible ectopy and detection errors.",
+    "Educational screening tool, not a medical device.",
+    "AI compatibility mode used the provider's default temperature after 0.2 was rejected."
+  ],
+  "disclaimer": "Educational screening tool, not a medical device.",
+  "source": {
+    "source": "synthetic",
+    "rhythm": "regular",
+    "seed": 7,
+    "sample_id": "synth-regular",
+    "label": "Synthetic \u2022 72 bpm \u2022 regular timing"
+  },
+  "detector": {
+    "method": "Own offline Pan-Tompkins",
+    "polarity": "upright",
+    "searchback_beats": 0
+  },
+  "explanation_error": null,
+  "explanation_grounding": {
+    "status": "passed",
+    "checked_numeric_claims": 14,
+    "method": "metric-and-unit-aware numeric matching with displayed-precision rounding",
+    "reasons": []
+  },
+  "explanation_model": "gpt-5.6-sol",
+  "explanation_settings": {
+    "requested_temperature": 0.2,
+    "effective_temperature": "provider_default",
+    "used_provider_default": true,
+    "compatibility_requested": true
+  },
+  "verification": {
+    "generated_utc": "2026-11-22T16:35:57.318249+00:00",
+    "flow": "Actual Node :3000 -> FastAPI :8765 -> AgentRouter -> numeric guard",
+    "input": "Synthetic demo only; measured JSON and config definitions; no image or raw samples sent to GPT",
+    "plots_present": 4,
+    "requested_provider_compatibility": true
+  }
+}
