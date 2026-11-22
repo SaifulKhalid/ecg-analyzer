@@ -27,7 +27,7 @@ class ReportFixture:
 
 
 def render_report(*, hr=72.0, ppm=6, rhythm=True, layout="3x4", grid="pink", grayscale=False,
-                  rotation=0, skew=0, jpeg_quality=None, photo=False, seed=1) -> ReportFixture:
+                  rotation=0, skew=0, jpeg_quality=None, photo=False, seed=1, join_cells=False) -> ReportFixture:
     columns = 4 if layout == "3x4" else 1
     rows = 12 if layout == "12x1" else 3
     width = round(270*ppm)
@@ -76,8 +76,13 @@ def render_report(*, hr=72.0, ppm=6, rhythm=True, layout="3x4", grid="pink", gra
             lead = row*columns+column if layout != "3-channel" else row
             cell_left = left + round((right-left)*column/columns)
             cell_right = left + round((right-left)*(column+1)/columns)
-            gap = round(2*ppm) if columns > 1 else 0
+            gap = round(2*ppm) if columns > 1 and not join_cells else 0
             draw_strip(cell_left+gap, cell_right-gap, baseline, lead, column*2.5 if columns > 1 else 0)
+            if column and join_cells:
+                before = np.interp(column*2.5-1/(25*ppm), times, signal(lead-1))
+                after = np.interp(column*2.5, times, signal(lead))
+                cv2.line(image, (cell_left-1, round(baseline-before*10*ppm)),
+                         (cell_left, round(baseline-after*10*ppm)), (12, 12, 12), 1)
             cv2.putText(image, LEADS[lead%12], (cell_left+round(2*ppm), baseline-round(12*ppm)), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (15, 15, 15), 1, cv2.LINE_AA)
             if column:
                 cv2.line(image, (cell_left, baseline-round(3*ppm)), (cell_left, baseline+round(3*ppm)), (20, 20, 20), 1)
@@ -111,7 +116,7 @@ def render_report(*, hr=72.0, ppm=6, rhythm=True, layout="3x4", grid="pink", gra
     buffer = io.BytesIO()
     picture.save(buffer, format="JPEG" if jpeg_quality else "PNG", **({"quality": jpeg_quality} if jpeg_quality else {}))
     parameters = dict(hr=hr, ppm=ppm, rhythm=rhythm, layout=layout, grid=grid, grayscale=grayscale,
-                      rotation=rotation, skew=skew, jpeg_quality=jpeg_quality, photo=photo, seed=seed)
+                      rotation=rotation, skew=skew, jpeg_quality=jpeg_quality, photo=photo, seed=seed, join_cells=join_cells)
     return ReportFixture(buffer.getvalue(), generated.true_hr, target, parameters)
 
 

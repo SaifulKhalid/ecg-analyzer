@@ -68,6 +68,20 @@ def _quality_reason(result, reason):
     result["findings"] = []
 
 
+def _remove_small_ink(rgb, box):
+    left, top, right, bottom = box
+    crop = rgb[top:bottom, left:right]
+    original = ink_mask(crop)
+    connected = cv2.morphologyEx(original, cv2.MORPH_CLOSE, np.ones((1, 3), np.uint8))
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(connected)
+    keep = [label for label in range(1, count) if stats[label, cv2.CC_STAT_WIDTH] >= max(25, (right-left)*0.12)
+            and stats[label, cv2.CC_STAT_HEIGHT] >= 4]
+    if keep:
+        # Remove small text only; no interpolated values or trace samples are
+        # invented here. The digitizer records any remaining missing columns.
+        crop[(original > 0) & ~np.isin(labels, keep)] = (255, 255, 255)
+
+
 def select_region(rgb: np.ndarray, *, pixels_per_mm=None, paper_speed=25, gain=10,
                   crop_box=None, notch_hz=50) -> Selection:
     """Evaluate at most eight independent strips/cells with the frozen pipeline."""
@@ -119,6 +133,7 @@ def select_region(rgb: np.ndarray, *, pixels_per_mm=None, paper_speed=25, gain=1
             # The frozen digitizer knows pink/red grids. Normalize only light
             # grid pixels; dark trace pixels and the original preview are kept.
             crop[grid_mask] = (245, 175, 190)
+        _remove_small_ink(measurement_image, candidate.box)
         try:
             ok, png = cv2.imencode(".png", cv2.cvtColor(measurement_image, cv2.COLOR_RGB2BGR))
             if not ok:
@@ -136,6 +151,8 @@ def select_region(rgb: np.ndarray, *, pixels_per_mm=None, paper_speed=25, gain=1
             recovered.calibration["amplitude_calibrated"] = amplitude_calibrated
             if candidate.kind != "manual" and result["measurements"]["duration_s"] < MIN_REGION_SECONDS:
                 _quality_reason(result, "Selected region is too short for reliable measurement (less than 5 s).")
+                for key in ("hr_mean_bpm", "hr_min_bpm", "hr_max_bpm", "mean_rr_ms", "sdnn_ms", "rmssd_ms", "pnn50_percent", "rr_cv"):
+                    result["measurements"][key] = None
             evaluated.append((candidate, recovered, result, notes, measurement_image, amplitude_calibrated))
         except (ValueError, TypeError, OSError, cv2.error) as error:
             # The digitizer's multiple-band check remains a safety net. A failed
@@ -200,6 +217,30 @@ def _trim_leading_pulse(mask, box):
     return box
 
 
+def _lead_cell_cuts(statistics, box, page_width):
+    """Detect repeated label positions even when divider ticks join the ink."""
+    left, top, right, bottom = box
+    labels = []
+    for x, y, w, h, area in statistics[1:]:
+        if (1 <= w <= max(30, page_width*0.025) and 5 <= h <= 35 and area >= 4
+                and left <= x < right and top-page_width*0.03 <= y < bottom):
+            labels.append(float(x+w/2))
+    clusters = []
+    for x in sorted(labels):
+        if not clusters or x-clusters[-1][-1] > max(8, page_width*0.015):
+            clusters.append([x])
+        else:
+            clusters[-1].append(x)
+    centers = [float(np.mean(cluster)) for cluster in clusters]
+    if len(centers) < 3 or centers[-1]-centers[0] < (right-left)*0.45:
+        return []
+    spacing = float(np.median(np.diff(centers)))
+    columns = round((right-left)/spacing)
+    if columns not in (3, 4, 6) or np.max(np.abs(np.diff(centers)-spacing)) > spacing*0.25:
+        return []
+    return [left+round((right-left)*index/columns) for index in range(1, columns)]
+
+
 def detect_candidates(rgb: np.ndarray) -> list[Candidate]:
     height, width = rgb.shape[:2]
     if min(height, width) < 60:
@@ -231,9 +272,15 @@ def detect_candidates(rgb: np.ndarray) -> list[Candidate]:
         for left, y0, right, y1, label in row:
             if right-left < width*0.12:
                 continue
-            kind = "long strip" if right-left >= LONG_STRIP_FRACTION*width else "segment"
-            box = [max(0, left-margin), max(0, y0-margin), min(width, right+margin), min(height, y1+margin)]
-            candidates.append(Candidate(kind, _trim_leading_pulse(mask, box), band_index))
-    candidates.sort(key=lambda item: (item.kind == "long strip", item.box[2]-item.box[0], item.box[3]), reverse=True)
+            cuts = _lead_cell_cuts(stats, [left, y0, right, y1], width) if right-left >= width*0.5 else []
+            for start, end in zip([left, *cuts], [*cuts, right]):
+                start += margin if cuts and start != left else 0
+                end -= margin if cuts and end != right else 0
+                fraction = (end-start)/width
+                kind = "long strip" if fraction >= LONG_STRIP_FRACTION else "row" if fraction >= 0.5 else "segment"
+                box = [max(0, start-margin if not cuts else start), max(0, y0-margin),
+                       min(width, end+margin if not cuts else end), min(height, y1+margin)]
+                candidates.append(Candidate(kind, _trim_leading_pulse(mask, box), band_index))
+    candidates.sort(key=lambda item: ({"long strip":2,"row":1,"segment":0}[item.kind], item.box[2]-item.box[0], item.box[3]), reverse=True)
     # Keep a range of rows/cells, with deterministic bottom-most ties.
     return candidates

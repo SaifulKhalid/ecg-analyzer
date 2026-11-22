@@ -35,13 +35,13 @@ Decisions:
 | Part B | PASS | 16 minutes; full 113 Python / 31 Node tests; 1280/390 record/image QA, DOM deck/banned audit, print hiding, 200 dpi/red-marker tests pass |
 | Part C P1 detection/generator | PASS | 11 minutes; 32 declared variants; 16 candidate/orientation/noise tests pass; JPEG/grid-crossing correction made only in new files |
 | Part C P2 scoring/API | PASS | 13 minutes; cap-8 scoring, manual precedence, no-grid/time-only handling; seven selection tests, two legacy image API checks, 105 bpm API, full-report 1280/390 browser flows pass |
-| Part C P3 robustness | Active | Started 21:43 UTC; 30 minute maximum |
-| Part C P4 UI/docs/final QA | Pending | 15 minute maximum |
+| Part C P3 robustness | PASS | 22 minutes; final 32 variants: 27/27 long strips <=3 bpm, 5/5 graceful short/uncalibrated; 13 format/adverse-image plus EXIF/alpha/hash checks; touching-lead/pulse/overlay regressions pass |
+| Part C P4 UI/docs/final QA | Active | Started 22:05 UTC; 15 minute maximum |
 
 Definition of Done:
 - [x] Part A: environment works; pytest/npm test pass; fingerprint matches.
 - [x] Part B: report UI done; results/ui-verification.md written; DOM grep clean.
-- [ ] Part C: full synthetic report works with no crop; layout-validation.md exists.
+- [x] Part C: full synthetic report works with no crop; layout-validation.md exists.
 - [ ] Full final pytest/npm test pass; frozen fingerprint unchanged.
 - [ ] Final report: files, run commands, results, assumptions, blocked items, limits.
 
@@ -64,6 +64,32 @@ This is layout engineering validation, with no changes to frozen thresholds.
 No-grid amplitude-dependent range/gain are null and plots use arbitrary units.
 SNR remains numeric because it is a dimensionless power ratio and does not
 depend on the unknown amplitude scale. The mandatory no-grid Note is shown.
+
+P3 decisions: remove small label ink components inside the measurement region,
+retain the original prepared page for Figures 1/6, and split touching lead rows
+at repeated label positions. Automatic regions under five seconds report null
+HR/RR summary values plus the quality notice; duration, sample rate, event count
+and plots remain available. This avoids misleading short-strip rate estimates.
+The peak list and the frozen extraction formulas are unchanged.
+
+P3 results: all 27 long-strip fixtures pass, maximum HR error 0.470 bpm; all five
+short/time-uncalibrated layouts have accurate Notes and unavailable rate values.
+13 adverse/format cases return structured responses with Notes: blank, random
+noise, non-ECG scene, 50x50, 6000x4000, RGBA, grayscale JPEG, CMYK JPEG, WebP,
+90-degree rotation, 3-degree skew, JPEG q60 and about 4 px/mm. EXIF/alpha and
+fingerprint tests pass; touching-lead rows, leading-pulse trimming and full-page
+overlay bounds pass. Results are in results/layout-validation.md/.json.
+
+Final browser run so far: seven flows pass, zero console errors. The 17,864,553
+byte original becomes a 1,048,886 byte JPEG at <=3000 px, retains its filename,
+sends explain=false, adds the single resize Note, and measures 71.395 bpm.
+Manual crop box [60,720,1560,920] wins. Blank input shows only the required
+no-trace message in the result area. Full reports work without crop at 1280/390.
+
+Blocked local-input checks: sample_ECG_image.png, ECG .png and samples/reports/
+are absent. Checked exact workspace paths, searched D:/ECG including ignored
+files, and checked tracked Git paths; the ignored supplied images were not
+included in this clone. No input was fabricated or overwritten to claim a pass.
 
 ## New-laptop setup and report UI request (2026-11-23 Asia/Dhaka)
 

@@ -133,5 +133,12 @@ def trace_overlay(rgb: np.ndarray, recovered, measurement_image=None) -> str:
     green = (debug[:, :, 1].astype(int) > debug[:, :, 0].astype(int) + 35) & (debug[:, :, 1].astype(int) > debug[:, :, 2].astype(int) + 35)
     if measurement_image is not None:
         green &= np.any(debug != cv2.cvtColor(measurement_image, cv2.COLOR_RGB2BGR), axis=2)
-    original[green] = (190, 70, 0)
+    points = []
+    for column in np.flatnonzero(np.any(green, axis=0)):
+        rows = np.flatnonzero(green[:, column])
+        weights = debug[rows, column, 1].astype(float) - np.maximum(debug[rows, column, 0], debug[rows, column, 2])
+        points.append((int(column), int(round(np.average(rows, weights=np.maximum(weights, 1))))))
+    if points:
+        cv2.polylines(original, [np.asarray(points, np.int32).reshape(-1, 1, 2)], False,
+                      (190, 70, 0), 1, lineType=cv2.LINE_AA)
     return encode_image(cv2.cvtColor(original, cv2.COLOR_BGR2RGB))
