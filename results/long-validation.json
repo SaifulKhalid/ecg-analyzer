@@ -1,0 +1,526 @@
+{
+  "generated_utc": "2026-11-22T14:10:17.130550+00:00",
+  "source": "MIT-BIH Arrhythmia Database 1.0.0, complete lead-0 recordings",
+  "protocol_sha256": "0a7439d275652019ff7e7b1faadd0ce55e00ab721321057f850ca67ed988ae83",
+  "protocol": {
+    "prepared_utc": "2026-11-22T14:10:02.184933+00:00",
+    "prepared_git_commit": "4c12a76ca797e419fd77f85999db674c7221b76e",
+    "measurement_fingerprint": "df4b1c6ac4feb0db7dbb91fa6a4f32ef779da9f2f91aba53fab7a0f7b75b5925",
+    "measurement_files": [
+      "config",
+      "preprocess",
+      "peaks",
+      "features",
+      "classify",
+      "quality",
+      "digitize",
+      "plots",
+      "synth"
+    ],
+    "lead_index": 0,
+    "scope": "Complete cached recordings; no selected intervals or excluded beats.",
+    "central_seconds": 290.0,
+    "context_seconds": 5.0,
+    "match_tolerance_seconds": 0.15,
+    "beat_symbols": [
+      "/",
+      "A",
+      "B",
+      "E",
+      "F",
+      "J",
+      "L",
+      "N",
+      "Q",
+      "R",
+      "S",
+      "V",
+      "a",
+      "e",
+      "f",
+      "j",
+      "n",
+      "r"
+    ],
+    "records": [
+      {
+        "record": "100",
+        "source_fs": 360,
+        "samples": 650000,
+        "seconds": 1805.5555555555557,
+        "file_sha256": {
+          "hea": "60ebc904c7bf3e04d142638d3fd5c903e8dc9f10f1ea3264e07926aa089ee75e",
+          "dat": "b2ea3c250e56e48f4b7b90697832b8ecd1afa1e0bb31f2dcfea4ed6e1075a639",
+          "atr": "8d8a5349fb16638ebbf649f1779d12e96d91b736b2aafe59db43719ae583d471"
+        }
+      },
+      {
+        "record": "101",
+        "source_fs": 360,
+        "samples": 650000,
+        "seconds": 1805.5555555555557,
+        "file_sha256": {
+          "hea": "d5f02fbe8673fa05465442191b98ca0d28a1670e7ef0e83fb9ef8723113a311c",
+          "dat": "698d1ea6f472d23ca50317c72c96cda2698badd8578220ed0380cdf241e39006",
+          "atr": "441cdd6486cfdf4c53e344d1048ab81296773e7058d53069022adc68543a0663"
+        }
+      },
+      {
+        "record": "106",
+        "source_fs": 360,
+        "samples": 650000,
+        "seconds": 1805.5555555555557,
+        "file_sha256": {
+          "hea": "ad5ed3ee5603926a07a09f0d0c9e2a7ff10a705dbafcde3d185317730a8839ab",
+          "dat": "c017bc18b95b1f970bca143a044ee5d54168648b541e47aa656f2737a59c1202",
+          "atr": "585347e6d1bd3ad89cdb52cb80945878a5e51026d81f871a376bb6e13936f7fa"
+        }
+      },
+      {
+        "record": "119",
+        "source_fs": 360,
+        "samples": 650000,
+        "seconds": 1805.5555555555557,
+        "file_sha256": {
+          "hea": "658f01382d7280a06e2f4c06363569d477394a6898c69ee788bb383f6092df63",
+          "dat": "02a286a28e69b441568add915f16a2856b22bab893bf8729ee9654411ed3a5aa",
+          "atr": "fd919c8ea20eed4a22fb37984977f30ce48d382eefd2d90934bf947a88e0fd7b"
+        }
+      },
+      {
+        "record": "201",
+        "source_fs": 360,
+        "samples": 650000,
+        "seconds": 1805.5555555555557,
+        "file_sha256": {
+          "hea": "dba34d6252879af28c1d10cde200989a4f6507d98df4395f5cba5f81af5b7e5a",
+          "dat": "16610ae46eff900794597503d15af4572a8b1518f18dbed2843b7e68c81f3898",
+          "atr": "df1276b6c6952b177ec6eea2be3edc7a96888454107a3ee56be880b0afaf6f35"
+        }
+      }
+    ],
+    "training": "none",
+    "post_result_tuning": "none"
+  },
+  "records": [
+    {
+      "record": "100",
+      "lead": "MLII",
+      "source_fs": 360,
+      "seconds": 1805.5555555555557,
+      "status": "ok",
+      "windows": [
+        {
+          "processing_start_s": 0.0,
+          "processing_stop_s": 295.0,
+          "central_start_s": 0.0,
+          "central_stop_s": 290.0,
+          "retained_beats": 359
+        },
+        {
+          "processing_start_s": 285.0,
+          "processing_stop_s": 585.0,
+          "central_start_s": 290.0,
+          "central_stop_s": 580.0,
+          "retained_beats": 375
+        },
+        {
+          "processing_start_s": 575.0,
+          "processing_stop_s": 875.0,
+          "central_start_s": 580.0,
+          "central_stop_s": 870.0,
+          "retained_beats": 371
+        },
+        {
+          "processing_start_s": 865.0,
+          "processing_stop_s": 1165.0,
+          "central_start_s": 870.0,
+          "central_stop_s": 1160.0,
+          "retained_beats": 359
+        },
+        {
+          "processing_start_s": 1155.0,
+          "processing_stop_s": 1455.0,
+          "central_start_s": 1160.0,
+          "central_stop_s": 1450.0,
+          "retained_beats": 358
+        },
+        {
+          "processing_start_s": 1445.0,
+          "processing_stop_s": 1745.0,
+          "central_start_s": 1450.0,
+          "central_stop_s": 1740.0,
+          "retained_beats": 364
+        },
+        {
+          "processing_start_s": 1735.0,
+          "processing_stop_s": 1805.5555555555557,
+          "central_start_s": 1740.0,
+          "central_stop_s": 1805.5555555555557,
+          "retained_beats": 87
+        }
+      ],
+      "tp": 2273,
+      "fp": 0,
+      "fn": 0,
+      "reference_beats": 2273,
+      "detected_beats": 2273,
+      "sensitivity": 100.0,
+      "ppv": 100.0,
+      "timing_mae_ms": 1.2214400938561465,
+      "missed_times_s": [],
+      "extra_times_s": []
+    },
+    {
+      "record": "101",
+      "lead": "MLII",
+      "source_fs": 360,
+      "seconds": 1805.5555555555557,
+      "status": "ok",
+      "windows": [
+        {
+          "processing_start_s": 0.0,
+          "processing_stop_s": 295.0,
+          "central_start_s": 0.0,
+          "central_stop_s": 290.0,
+          "retained_beats": 332
+        },
+        {
+          "processing_start_s": 285.0,
+          "processing_stop_s": 585.0,
+          "central_start_s": 290.0,
+          "central_stop_s": 580.0,
+          "retained_beats": 297
+        },
+        {
+          "processing_start_s": 575.0,
+          "processing_stop_s": 875.0,
+          "central_start_s": 580.0,
+          "central_stop_s": 870.0,
+          "retained_beats": 287
+        },
+        {
+          "processing_start_s": 865.0,
+          "processing_stop_s": 1165.0,
+          "central_start_s": 870.0,
+          "central_stop_s": 1160.0,
+          "retained_beats": 297
+        },
+        {
+          "processing_start_s": 1155.0,
+          "processing_stop_s": 1455.0,
+          "central_start_s": 1160.0,
+          "central_stop_s": 1450.0,
+          "retained_beats": 299
+        },
+        {
+          "processing_start_s": 1445.0,
+          "processing_stop_s": 1745.0,
+          "central_start_s": 1450.0,
+          "central_stop_s": 1740.0,
+          "retained_beats": 291
+        },
+        {
+          "processing_start_s": 1735.0,
+          "processing_stop_s": 1805.5555555555557,
+          "central_start_s": 1740.0,
+          "central_stop_s": 1805.5555555555557,
+          "retained_beats": 65
+        }
+      ],
+      "tp": 1864,
+      "fp": 4,
+      "fn": 1,
+      "reference_beats": 1865,
+      "detected_beats": 1868,
+      "sensitivity": 99.94638069705094,
+      "ppv": 99.78586723768737,
+      "timing_mae_ms": 2.0220553171214344,
+      "missed_times_s": [
+        175.875
+      ],
+      "extra_times_s": [
+        175.3,
+        176.124,
+        319.92,
+        320.272
+      ]
+    },
+    {
+      "record": "106",
+      "lead": "MLII",
+      "source_fs": 360,
+      "seconds": 1805.5555555555557,
+      "status": "ok",
+      "windows": [
+        {
+          "processing_start_s": 0.0,
+          "processing_stop_s": 295.0,
+          "central_start_s": 0.0,
+          "central_stop_s": 290.0,
+          "retained_beats": 321
+        },
+        {
+          "processing_start_s": 285.0,
+          "processing_stop_s": 585.0,
+          "central_start_s": 290.0,
+          "central_stop_s": 580.0,
+          "retained_beats": 304
+        },
+        {
+          "processing_start_s": 575.0,
+          "processing_stop_s": 875.0,
+          "central_start_s": 580.0,
+          "central_stop_s": 870.0,
+          "retained_beats": 351
+        },
+        {
+          "processing_start_s": 865.0,
+          "processing_stop_s": 1165.0,
+          "central_start_s": 870.0,
+          "central_stop_s": 1160.0,
+          "retained_beats": 346
+        },
+        {
+          "processing_start_s": 1155.0,
+          "processing_stop_s": 1455.0,
+          "central_start_s": 1160.0,
+          "central_stop_s": 1450.0,
+          "retained_beats": 296
+        },
+        {
+          "processing_start_s": 1445.0,
+          "processing_stop_s": 1745.0,
+          "central_start_s": 1450.0,
+          "central_stop_s": 1740.0,
+          "retained_beats": 324
+        },
+        {
+          "processing_start_s": 1735.0,
+          "processing_stop_s": 1805.5555555555557,
+          "central_start_s": 1740.0,
+          "central_stop_s": 1805.5555555555557,
+          "retained_beats": 81
+        }
+      ],
+      "tp": 2022,
+      "fp": 1,
+      "fn": 5,
+      "reference_beats": 2027,
+      "detected_beats": 2023,
+      "sensitivity": 99.7533300444006,
+      "ppv": 99.95056846267919,
+      "timing_mae_ms": 3.9758764699424667,
+      "missed_times_s": [
+        862.0166666666667,
+        863.6638888888889,
+        868.9305555555555,
+        1219.3722222222223,
+        1221.611111111111
+      ],
+      "extra_times_s": [
+        1805.5240000000001
+      ]
+    },
+    {
+      "record": "119",
+      "lead": "MLII",
+      "source_fs": 360,
+      "seconds": 1805.5555555555557,
+      "status": "ok",
+      "windows": [
+        {
+          "processing_start_s": 0.0,
+          "processing_stop_s": 295.0,
+          "central_start_s": 0.0,
+          "central_stop_s": 290.0,
+          "retained_beats": 315
+        },
+        {
+          "processing_start_s": 285.0,
+          "processing_stop_s": 585.0,
+          "central_start_s": 290.0,
+          "central_stop_s": 580.0,
+          "retained_beats": 322
+        },
+        {
+          "processing_start_s": 575.0,
+          "processing_stop_s": 875.0,
+          "central_start_s": 580.0,
+          "central_stop_s": 870.0,
+          "retained_beats": 318
+        },
+        {
+          "processing_start_s": 865.0,
+          "processing_stop_s": 1165.0,
+          "central_start_s": 870.0,
+          "central_stop_s": 1160.0,
+          "retained_beats": 321
+        },
+        {
+          "processing_start_s": 1155.0,
+          "processing_stop_s": 1455.0,
+          "central_start_s": 1160.0,
+          "central_stop_s": 1450.0,
+          "retained_beats": 321
+        },
+        {
+          "processing_start_s": 1445.0,
+          "processing_stop_s": 1745.0,
+          "central_start_s": 1450.0,
+          "central_stop_s": 1740.0,
+          "retained_beats": 319
+        },
+        {
+          "processing_start_s": 1735.0,
+          "processing_stop_s": 1805.5555555555557,
+          "central_start_s": 1740.0,
+          "central_stop_s": 1805.5555555555557,
+          "retained_beats": 72
+        }
+      ],
+      "tp": 1987,
+      "fp": 1,
+      "fn": 0,
+      "reference_beats": 1987,
+      "detected_beats": 1988,
+      "sensitivity": 100.0,
+      "ppv": 99.9496981891348,
+      "timing_mae_ms": 2.081809539788369,
+      "missed_times_s": [],
+      "extra_times_s": [
+        1805.512
+      ]
+    },
+    {
+      "record": "201",
+      "lead": "MLII",
+      "source_fs": 360,
+      "seconds": 1805.5555555555557,
+      "status": "ok",
+      "windows": [
+        {
+          "processing_start_s": 0.0,
+          "processing_stop_s": 295.0,
+          "central_start_s": 0.0,
+          "central_stop_s": 290.0,
+          "retained_beats": 428
+        },
+        {
+          "processing_start_s": 285.0,
+          "processing_stop_s": 585.0,
+          "central_start_s": 290.0,
+          "central_stop_s": 580.0,
+          "retained_beats": 303
+        },
+        {
+          "processing_start_s": 575.0,
+          "processing_stop_s": 875.0,
+          "central_start_s": 580.0,
+          "central_stop_s": 870.0,
+          "retained_beats": 247
+        },
+        {
+          "processing_start_s": 865.0,
+          "processing_stop_s": 1165.0,
+          "central_start_s": 870.0,
+          "central_stop_s": 1160.0,
+          "retained_beats": 255
+        },
+        {
+          "processing_start_s": 1155.0,
+          "processing_stop_s": 1455.0,
+          "central_start_s": 1160.0,
+          "central_stop_s": 1450.0,
+          "retained_beats": 245
+        },
+        {
+          "processing_start_s": 1445.0,
+          "processing_stop_s": 1745.0,
+          "central_start_s": 1450.0,
+          "central_stop_s": 1740.0,
+          "retained_beats": 357
+        },
+        {
+          "processing_start_s": 1735.0,
+          "processing_stop_s": 1805.5555555555557,
+          "central_start_s": 1740.0,
+          "central_stop_s": 1805.5555555555557,
+          "retained_beats": 82
+        }
+      ],
+      "tp": 1917,
+      "fp": 0,
+      "fn": 46,
+      "reference_beats": 1963,
+      "detected_beats": 1917,
+      "sensitivity": 97.65664798777381,
+      "ppv": 100.0,
+      "timing_mae_ms": 4.84211441488525,
+      "missed_times_s": [
+        48.75833333333333,
+        391.425,
+        428.9111111111111,
+        431.0777777777778,
+        439.11944444444447,
+        449.7361111111111,
+        468.09166666666664,
+        477.9555555555556,
+        478.43055555555554,
+        479.5361111111111,
+        479.9138888888889,
+        484.225,
+        637.1361111111111,
+        740.1833333333333,
+        745.35,
+        755.4333333333333,
+        761.7555555555556,
+        777.4722222222222,
+        979.5916666666667,
+        995.3083333333333,
+        1089.0027777777777,
+        1100.7111111111112,
+        1106.8805555555555,
+        1126.7388888888888,
+        1187.525,
+        1187.8944444444444,
+        1194.0805555555555,
+        1205.3555555555556,
+        1215.3222222222223,
+        1215.7194444444444,
+        1228.6361111111112,
+        1253.1083333333333,
+        1253.4833333333333,
+        1256.0944444444444,
+        1264.0194444444444,
+        1274.0722222222223,
+        1290.486111111111,
+        1470.7222222222222,
+        1476.6972222222223,
+        1478.6666666666667,
+        1516.9388888888889,
+        1522.861111111111,
+        1523.2055555555555,
+        1686.1666666666667,
+        1796.361111111111,
+        1801.65
+      ],
+      "extra_times_s": []
+    }
+  ],
+  "coverage": "5/5",
+  "duration_minutes": 150.46296296296296,
+  "macro_sensitivity": 99.47127174584507,
+  "macro_ppv": 99.93722677790026,
+  "pooled_sensitivity": 99.48591201186358,
+  "pooled_ppv": 99.94041116297547,
+  "totals": {
+    "tp": 10063,
+    "fp": 6,
+    "fn": 52,
+    "reference_beats": 10115,
+    "detected_beats": 10069
+  },
+  "measurement_code_unchanged": true,
+  "training": "none"
+}

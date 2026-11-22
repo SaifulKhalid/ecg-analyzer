@@ -23,8 +23,8 @@ permitted helper second opinion.
 | 8 Optional provider compatibility | 15 min | Complete | 16.3 min | Strict / opt-in tests, real five-section API response, default-off UI and provenance pass |
 | 9 Continuation wrap | 5 min | Complete | 3.7 min | 67 Python + 30 Node tests, build / UI / audits pass; original results preserved |
 | 10 Final reporting audit | 5 min | Complete | 4.6 min development | Legacy / missing initial metadata fixed; 69 tests pass; final log retrieval passed original deadline |
-| 11 Longer MIT-BIH validation | 25 min | In progress | 0 | Frozen DSP, full cached lead-0 records, seam-aware windows and honest metrics |
-| 12 Explanation grounding | 30 min | Pending | 0 | Reject unsupported numeric claims; measured JSON only; mocked tests |
+| 11 Longer MIT-BIH validation | 25 min | Complete | 2.6 min | 150.46 minutes; macro sensitivity 99.47%, PPV 99.94%; 6 boundary tests pass |
+| 12 Explanation grounding | 30 min | In progress | 0 | Reject unsupported numeric claims; measured JSON only; mocked tests |
 | 13 Documentation / live QA | 20 min | Pending | 0 | Preserve original results, document wider validation / grounding, check UI / API |
 | 14 Extended wrap | 5 min | Pending | 0 | Final tests, commits and audits before 15:33:48 UTC |
 
@@ -286,3 +286,10 @@ temperature 0.2, so explanation can remain null while measured results work.
   290-second half-open central windows with 5-second context (maximum 300 seconds),
   original beat symbols and 150 ms one-to-one matching. Commit the protocol and
   boundary tests before evaluating; do not tune DSP after seeing wider results.
+- 14:10:17 UTC — Complete-record evaluation finished after protocol commit
+  `78ddc7c`. All five records / 150.46 minutes included: 10,063 TP, 6 FP, 52 FN;
+  macro sensitivity 99.47%, PPV 99.94%; pooled sensitivity 99.49%, PPV 99.94%.
+  Record 100 has 2,273/2,273 matched events; record 201 has 46 missed events.
+  Save separate long-validation artifacts, including every unmatched timestamp.
+  No detector changes, interval selection, dataset training or additional GPT calls.
+  Phase 11 completed under its 25-minute ceiling; begin report-layer grounding.
