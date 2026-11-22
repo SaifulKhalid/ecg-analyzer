@@ -17,7 +17,7 @@ permitted helper second opinion.
 | 3 UI + plots | 60 min | Complete | 21.0 min | Desktop / mobile real demos pass, four plots visible, build passes on Node 22.18 |
 | 4 Image digitizer | 75 min | Complete | 30 min | 18 image tests, 14-case round-trip gate, actual browser multipart upload pass |
 | 5 GPT comparison | 25 min | Complete | 20.3 min | 10 paired real GPT replies; HR MAE 0.00823 vs 0.02047; categorical accuracy ties at 100% |
-| 6 Wrap + checks | 5 min | In progress | 0 | Start 10:13:17 UTC; full pytest / Node / build, README and Git audit |
+| 6 Wrap + checks | 5 min | Complete | 4.3 min | 62 Python + 27 Node tests; build / live UI / data-secret audit pass; README complete |
 
 ## Recon and assumptions
 
@@ -78,8 +78,8 @@ permitted helper second opinion.
 - [x] `/analyze` works on a rendered grid image
 - [x] Production GPT gets measured JSON only
 - [x] `comparison.md` exists
-- [ ] `pytest` passes
-- [ ] README has architecture diagram + limitations
+- [x] `pytest` passes
+- [x] README has architecture diagram + limitations
 
 ## Work log
 
@@ -176,3 +176,32 @@ permitted helper second opinion.
 - 10:13:17 UTC — Phase 5 complete; commit results, initial audit, comparison
   script and analytic correction. Begin five-minute wrap. No phase exceeded
   its time box; hard budget still has more than three hours remaining.
+- 10:17:32 UTC — Final checks: 62 pytest tests pass (24.46 s), 27 Node tests pass,
+  Cloudflare build passes under isolated Node 22.18. Updated real desktop/mobile
+  verification passes; rendered-image upload now measures 72.01 bpm with the
+  corrected calibration. No console errors. Nonfatal upstream Matplotlib /
+  PyParsing deprecation warnings remain. No tracked data / credential files and
+  no configured key values in tracked file contents. `git diff --check` passes.
+  README has the actual architecture, commands, result tables, initial-result
+  audit, source limits and future work. All definition-of-done boxes are checked.
+  Finished in approximately **104 minutes**, within the 300-minute hard budget.
+
+## Files by phase and commits
+
+| Phase | Files / changes | Commit |
+| --- | --- | --- |
+| Baseline | Preserve existing Node / vanilla / Worker app; ignore credentials and data | `7c8d6bb` |
+| 0 | `ecg/` skeleton / `config.py`, requirements + constraints, `.env.example`, downloader, progress | `467765c` |
+| 1 | `preprocess.py`, `peaks.py`, `features.py`, `synth.py`, `validate.py`, DSP tests, validation results | `23b9bb4` |
+| 2 | `quality.py`, `classify.py`, `report.py`, `api.py`, `pipeline.py`, `samples.py`, shared client / Node / Worker proxy, API tests | `746d89f` |
+| 3 | `plots.py`, `app.js`, `index.html`, `style.css`, port / Node-engine fixes, UI verification | `6856ce9` |
+| Correction | Track the private `scripts/agentrouter_bridge.mjs` omitted from phase 2 staging | `a30cc34` |
+| 4 | `digitize.py`, image API / rendering, image-validation mode / tables, image and search-back tests | `48b910d` |
+| 5 | `compare_gpt.py`, comparison tests / initial and revised results, analytic grid correction | `13cd7a0` |
+| 6 | README, final progress / checklist, updated live UI verification | Final phase 6 commit |
+
+No dataset training; no threshold fitting to patient labels; no phase overrun.
+The paired HR improvement is very small in absolute bpm and follows an openly
+recorded analytic correction on the same benchmark. Both methods tie on the
+±3 bpm and RR-label metrics. Current AgentRouter models reject explanation
+temperature 0.2, so explanation can remain null while measured results work.
