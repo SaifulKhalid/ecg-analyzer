@@ -1,0 +1,4 @@
+# wfdb 4.3.0 initializes annotation tables using NumPy string arrays.
+# pandas 3.x changed .values to StringArray, which breaks that initialization.
+# This pins an existing wfdb transitive dependency, not an extra app dependency.
+pandas==2.2.3
