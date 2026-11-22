@@ -103,6 +103,10 @@ The image-only benchmark continues to use the model default temperature.
 npm test
 ```
 
+Offline mode preserves historical GPT replies when their PNG hashes match,
+even after a client-only update. Source protocol fingerprints are retained;
+this is a comparison against the recorded replies, with no new API calls.
+
 The nine direct Python dependencies are pinned in [requirements.txt](requirements.txt).
 [constraints.txt](constraints.txt) pins WFDB's pandas dependency to a compatible
 version. No model weights, training framework or library beat detector is used.

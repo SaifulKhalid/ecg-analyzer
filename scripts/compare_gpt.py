@@ -101,6 +101,8 @@ def write_report(rows: list[dict], output_dir: Path, fingerprint: str) -> dict:
     metrics = comparison_metrics(rows)
     summary = {"generated_utc": datetime.now(timezone.utc).isoformat(), "code_fingerprint": fingerprint,
                "gpt_protocol_fingerprint": gpt_protocol_fingerprint(),
+               "gpt_prediction_protocol_fingerprints": sorted({row["gpt"].get("source_protocol_fingerprint", gpt_protocol_fingerprint())
+                                                                for row in rows if row["gpt"]["status"] in ("ok", "no_estimate")}),
                "seed": cfg.COMPARISON_SEED, "duration_seconds": cfg.COMPARISON_DURATION_SECONDS,
                "gpt_input": "same image only; printed calibration; model default temperature",
                "pipeline_input": "same image -> auto digitization -> own DSP; LLM explanation disabled",
@@ -153,6 +155,7 @@ def write_report(rows: list[dict], output_dir: Path, fingerprint: str) -> dict:
                   "  Production JSON explanations retain the requested temperature 0.2 and return null on failure.",
                   "- Successful GPT predictions are checkpointed and reused only for the same image SHA-256 and GPT protocol fingerprint.",
                   "  DSP code has its own fingerprint, so an analytic DSP correction can be measured against unchanged GPT replies.",
+                  "  Offline mode can compare historical replies on identical PNGs after client changes; each reply retains its source protocol fingerprint.",
                   "  Every case and failure is shown; no selection by error and no rerunning valid predictions to find a better score.",
                   "- Timing labels describe simulator RR variability only, not AFib or any clinical condition.",
                   "  These ten clean rendered strips are a small engineering benchmark; photo accuracy and clinical accuracy are unproven.",
@@ -191,13 +194,15 @@ def run_comparison(output_dir: Path = cfg.RESULTS_DIR, *, offline: bool = False,
     requester = estimate_gpt if gpt_requester is None else gpt_requester
     fingerprint = code_fingerprint()
     cache = {}
+    cached_protocol = None
     cache_file = output_dir / "comparison.json"
     if cache_file.exists():
         try:
             previous = json.loads(cache_file.read_text(encoding="utf-8"))
-            if (previous.get("code_fingerprint") == fingerprint
+            if (offline or previous.get("code_fingerprint") == fingerprint
                     or previous.get("gpt_protocol_fingerprint") == gpt_protocol_fingerprint()):
                 cache = {row["case_id"]: row for row in previous.get("cases", [])}
+                cached_protocol = previous.get("gpt_protocol_fingerprint")
         except (OSError, ValueError):
             pass
     image_dir = output_dir / "images"
@@ -225,7 +230,8 @@ def run_comparison(output_dir: Path = cfg.RESULTS_DIR, *, offline: bool = False,
             pipeline = {"status": "failed", "heart_rate_bpm": None, "rhythm": "unknown", "error": str(error)}
         cached = cache.get(specification["id"])
         if cached and cached.get("image_sha256") == image_hash and cached["gpt"]["status"] in ("ok", "no_estimate"):
-            gpt = {**cached["gpt"], "cached": True}
+            gpt = {**cached["gpt"], "cached": True,
+                   "source_protocol_fingerprint": cached["gpt"].get("source_protocol_fingerprint", cached_protocol)}
         elif offline or failures >= cfg.COMPARISON_MAX_CONSECUTIVE_FAILURES or time.monotonic() - started > max_seconds - cfg.COMPARISON_TIMEOUT_SECONDS:
             reason = "API not run (--offline)." if offline else "API calls stopped after consecutive failures or time budget; no result fabricated."
             gpt = {"status": "not_run", "heart_rate_bpm": None, "rhythm": "unknown", "error": reason}

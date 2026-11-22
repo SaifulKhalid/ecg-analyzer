@@ -20,7 +20,7 @@ permitted helper second opinion.
 | 6 Wrap + checks | 5 min | Complete | 4.3 min | 62 Python + 27 Node tests; build / live UI / data-secret audit pass; README complete |
 | 7 Fresh synthetic validation | 15 min | Complete | 11 min | 10/10 fresh GPT replies; frozen DSP HR MAE 0.01551 vs 0.19436 bpm |
 | 8 Optional provider compatibility | 15 min | Complete | 16.3 min | Strict / opt-in tests, real five-section API response, default-off UI and provenance pass |
-| 9 Continuation wrap | 5 min | In progress | 0 | Final checks and commits; original 13:33:48 UTC hard stop persists |
+| 9 Continuation wrap | 5 min | Complete | 3.7 min | 67 Python + 30 Node tests, build / UI / audits pass; original results preserved |
 
 ## Recon and assumptions
 
@@ -201,7 +201,10 @@ permitted helper second opinion.
 | Correction | Track the private `scripts/agentrouter_bridge.mjs` omitted from phase 2 staging | `a30cc34` |
 | 4 | `digitize.py`, image API / rendering, image-validation mode / tables, image and search-back tests | `48b910d` |
 | 5 | `compare_gpt.py`, comparison tests / initial and revised results, analytic grid correction | `13cd7a0` |
-| 6 | README, final progress / checklist, updated live UI verification | Final phase 6 commit |
+| 6 | README, final progress / checklist, updated live UI verification | `af1c280` |
+| 7 | Predeclared fresh case manifest / script, frozen-module tests, fresh results | `b38df6f`, `1b392af` |
+| 8 | Explicit temperature compatibility in client / bridge / API / UI, tests and live explanation evidence | `eb60aec` |
+| 9 | Historical offline prediction preservation, final documentation and checks | Continuation wrap commit |
 
 No dataset training; no threshold fitting to patient labels; no phase overrun.
 The paired HR improvement is very small in absolute bpm and follows an openly
@@ -246,3 +249,13 @@ temperature 0.2, so explanation can remain null while measured results work.
   gating. Sixteen targeted Python tests and seven report-client tests pass.
   Actual compatibility API response and fresh responsive verification are saved.
   The 15-minute target ran slightly long (under the 20% scope-cut threshold).
+- 13:23:24 UTC — Final continuation checks pass: 67 pytest tests (35.98 s),
+  30 Node tests, Cloudflare build under Node 22.18, live synthetic compatibility
+  API and desktop/mobile UI. No tracked data / credential files or configured
+  key values in tracked contents; measurement hash still matches the predeclared
+  fresh-study manifest. Original comparison values remain 0.00823 / 0.02047 bpm;
+  fresh validation values remain 0.01551 / 0.19436 bpm. All existing artifacts
+  were preserved. Added an offline-history regression: identical PNGs can reuse
+  original GPT replies after client-only changes, with source protocol provenance.
+  No further model calls / dataset training / DSP tuning. Commit final checkpoint
+  before the original **13:33:48 UTC** hard stop.

@@ -73,11 +73,13 @@ def run(output_dir: Path, *, offline: bool = False, max_seconds: float = 750) ->
         raise ValueError("Frozen measurement modules changed; do not silently reuse this study.")
     manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
     cache = {}
+    cached_protocol = None
     checkpoint = output_dir / "comparison.json"
     if checkpoint.exists():
         previous = json.loads(checkpoint.read_text(encoding="utf-8"))
         if previous.get("manifest_sha256") == manifest_hash:
             cache = {row["case_id"]: row for row in previous["cases"]}
+            cached_protocol = previous.get("gpt_protocol_fingerprint")
     image_dir = output_dir / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
     rows = []
@@ -97,7 +99,8 @@ def run(output_dir: Path, *, offline: bool = False, max_seconds: float = 750) ->
                     "quality": measured["quality"], "calibration": recovered.calibration}
         cached = cache.get(case["case_id"])
         if cached and cached["image_sha256"] == image_hash and cached["gpt"]["status"] in ("ok", "no_estimate"):
-            gpt = {**cached["gpt"], "cached": True}
+            gpt = {**cached["gpt"], "cached": True,
+                   "source_protocol_fingerprint": cached["gpt"].get("source_protocol_fingerprint", cached_protocol)}
         elif offline or failures >= 3 or time.monotonic() - started > max_seconds - cfg.COMPARISON_TIMEOUT_SECONDS:
             gpt = {"status": "not_run", "heart_rate_bpm": None, "rhythm": "unknown",
                    "error": "Not run: offline, consecutive provider failures or study time budget."}

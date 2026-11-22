@@ -72,3 +72,22 @@ def test_same_gpt_prediction_is_reused_after_dsp_revision(tmp_path, monkeypatch)
     assert len(calls) == 1
     assert revised["cases"][0]["gpt"]["cached"]
     assert revised["cases"][0]["gpt"]["heart_rate_bpm"] == 45
+
+
+def test_offline_history_preserves_predictions_after_client_change(tmp_path, monkeypatch):
+    import json
+
+    monkeypatch.setattr(compare_gpt.cfg, "COMPARISON_CASES", compare_gpt.cfg.COMPARISON_CASES[:1])
+    monkeypatch.setattr(compare_gpt.cfg, "COMPARISON_PAUSE_SECONDS", 0)
+    compare_gpt.run_comparison(tmp_path, gpt_requester=lambda image: {
+        "status": "ok", "heart_rate_bpm": 45, "rhythm": "regular", "model": "original"})
+    path = tmp_path / "comparison.json"
+    original = json.loads(path.read_text())
+    original["code_fingerprint"] = "older code"
+    original["gpt_protocol_fingerprint"] = "original client protocol"
+    path.write_text(json.dumps(original))
+    result = compare_gpt.run_comparison(tmp_path, offline=True,
+        gpt_requester=lambda image: pytest.fail("Offline history must not call GPT."))
+    assert result["metrics"]["gpt_hr_coverage"] == 1
+    assert result["cases"][0]["gpt"]["heart_rate_bpm"] == 45
+    assert result["cases"][0]["gpt"]["source_protocol_fingerprint"] == "original client protocol"
