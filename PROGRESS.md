@@ -33,8 +33,8 @@ Decisions:
 | --- | --- | --- |
 | Part A | PASS | Existing completed setup: 111 Python / 31 Node tests, MIT-BIH, matching hash |
 | Part B | PASS | 16 minutes; full 113 Python / 31 Node tests; 1280/390 record/image QA, DOM deck/banned audit, print hiding, 200 dpi/red-marker tests pass |
-| Part C P1 detection/generator | Active | Started 21:21 UTC; 45 minute maximum |
-| Part C P2 scoring/API | Pending | 30 minute maximum |
+| Part C P1 detection/generator | PASS | 11 minutes; 32 declared variants; 16 candidate/orientation/noise tests pass; JPEG/grid-crossing correction made only in new files |
+| Part C P2 scoring/API | Active | Started 21:31 UTC; 30 minute maximum |
 | Part C P3 robustness | Pending | 30 minute maximum |
 | Part C P4 UI/docs/final QA | Pending | 15 minute maximum |
 
