@@ -1,15 +1,18 @@
 """FastAPI measured ECG service; Node keeps serving the existing frontend."""
 
 from typing import Literal
+import base64
+import json
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, model_validator
 
 from . import __version__, config as cfg
 from .pipeline import analyze_signal
 from .preprocess import Signal
 from .samples import list_samples, load_sample
+from .digitize import digitize
 
 app = FastAPI(title="Measured ECG screening", version=__version__, description=cfg.DISCLAIMER)
 
@@ -52,6 +55,25 @@ def analyze_signal_endpoint(body: SignalRequest) -> dict:
         return analyze_signal(signal, explain=body.explain, notch_hz=body.notch_hz)
     except (ValueError, OSError) as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.post("/analyze")
+def analyze_image_endpoint(image: UploadFile = File(...), pixels_per_mm: float | None = Form(None),
+                           paper_speed: float = Form(cfg.PAPER_SPEED_MM_S), gain: float = Form(cfg.GAIN_MM_MV),
+                           crop_box: str | None = Form(None), explain: bool = Form(True),
+                           notch_hz: int = Form(int(cfg.NOTCH_HZ))) -> dict:
+    try:
+        bounds = json.loads(crop_box) if crop_box else None
+        image_bytes = image.file.read(cfg.MAX_IMAGE_BYTES + 1)
+        recovered = digitize(image_bytes, pixels_per_mm=pixels_per_mm, paper_speed=paper_speed,
+                             gain=gain, crop_box=bounds)
+        result = analyze_signal(recovered.signal, explain=explain, notch_hz=notch_hz)
+        result["plots"]["digitization"] = base64.b64encode(recovered.debug_overlay).decode("ascii")
+        return result
+    except (ValueError, OSError, TypeError) as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    finally:
+        image.file.close()
 
 
 if __name__ == "__main__":

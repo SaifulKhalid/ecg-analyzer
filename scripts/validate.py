@@ -124,11 +124,95 @@ def run_validation(data_dir: Path = cfg.DATA_DIR, output_dir: Path = cfg.RESULTS
     return summary
 
 
+def run_image_validation(output_dir: Path = cfg.RESULTS_DIR) -> dict:
+    """Known-calibration round trips; synthetic timing and MIT-BIH annotation HR."""
+    from ecg.digitize import digitize
+    from ecg.pipeline import analyze_signal
+    from ecg.plots import render_ecg_image
+    from ecg.preprocess import Signal
+    from ecg.synth import generate_ecg
+
+    scenarios = []
+    for scale in cfg.IMAGE_VALIDATION_PPM:
+        for hr in cfg.IMAGE_VALIDATION_HR:
+            generated = generate_ecg(hr, noise=0.015, mains_amplitude=0.08, baseline_wander=0.15)
+            scenarios.append((f"Synthetic {hr} bpm / {scale} px/mm", generated.signal, generated.true_hr,
+                              {"pixels_per_mm": scale}, {}))
+    for label, options, scale in [("Irregular RR", {"irregular": True}, 8),
+                                   ("Inverted trace", {"invert": True}, 8),
+                                   ("Fractional spacing", {}, 7.5)]:
+        generated = generate_ecg(75, noise=0.01, **options)
+        scenarios.append((label, generated.signal, generated.true_hr, {"pixels_per_mm": scale}, {}))
+    generated = generate_ecg(92, noise=0.01)
+    scenarios.append(("50 mm/s / 5 mm/mV overrides", generated.signal, generated.true_hr,
+                      {"pixels_per_mm": 8, "paper_speed": 50, "gain": 5},
+                      {"pixels_per_mm": 8, "paper_speed": 50, "gain": 5}))
+    if (cfg.DATA_DIR / "100.dat").exists():
+        import wfdb
+
+        path = str(cfg.DATA_DIR / "100")
+        header = wfdb.rdheader(path)
+        count = int(cfg.COMPARISON_DURATION_SECONDS * header.fs)
+        record = wfdb.rdrecord(path, sampto=count, channels=[0])
+        annotations = wfdb.rdann(path, "atr", sampto=count)
+        beats = np.asarray([sample for sample, symbol in zip(annotations.sample, annotations.symbol)
+                            if symbol in cfg.BEAT_ANNOTATIONS and sample < count]) / record.fs
+        truth = float(60 / np.mean(np.diff(beats)))
+        scenarios.append(("MIT-BIH 100 / first 12 s", Signal(record.p_signal[:, 0], record.fs), truth, {}, {}))
+    rows = []
+    for name, signal, truth, render_parameters, digitize_parameters in scenarios:
+        try:
+            recovered = digitize(render_ecg_image(signal, **render_parameters), **digitize_parameters)
+            result = analyze_signal(recovered.signal, explain=False, include_plots=False)
+            estimate = result["measurements"]["hr_mean_bpm"]
+            error = abs(estimate - truth) if estimate is not None else None
+            rows.append({"case": name, "true_hr": truth, "measured_hr": estimate,
+                         "absolute_error": error, "pixels_per_mm": recovered.calibration["pixels_per_mm"],
+                         "quality": result["status"]})
+        except ValueError as error:
+            rows.append({"case": name, "true_hr": truth, "measured_hr": None,
+                         "absolute_error": None, "quality": "failed", "error": str(error)})
+    errors = [row["absolute_error"] for row in rows if row["absolute_error"] is not None]
+    passed = all(row["quality"] == "ok" and row["absolute_error"] is not None
+                 and row["absolute_error"] <= cfg.IMAGE_MAX_HR_ERROR_BPM for row in rows)
+    summary = {"generated_utc": datetime.now(timezone.utc).isoformat(), "cases": rows,
+               "mean_absolute_hr_error": float(np.mean(errors)) if errors else None,
+               "max_absolute_hr_error": float(np.max(errors)) if errors else None, "passed": passed}
+    lines = ["# Calibrated image round-trip validation", "", cfg.DISCLAIMER, "",
+             f"Generated: {summary['generated_utc']}", "",
+             "Command: `python scripts/validate.py --images` (offline; MIT-BIH row included when cached).", "",
+             "| Case | Ground-truth HR | Measured HR | Absolute error | Recovered px/mm | Quality |",
+             "| --- | ---: | ---: | ---: | ---: | --- |"]
+    for row in rows:
+        if row["absolute_error"] is None:
+            lines.append(f"| {row['case']} | {row['true_hr']:.2f} | unavailable | — | — | failed |")
+        else:
+            lines.append(f"| {row['case']} | {row['true_hr']:.2f} | {row['measured_hr']:.2f} "
+                         f"| {row['absolute_error']:.3f} bpm | {row['pixels_per_mm']:.3f} | {row['quality']} |")
+    lines.extend(["", f"**Gate: {'PASS' if passed else 'FAIL'}** — every case needs valid quality and HR error ≤3 bpm.",
+                  f"Mean absolute error: **{summary['mean_absolute_hr_error']:.3f} bpm**; "
+                  f"maximum: **{summary['max_absolute_hr_error']:.3f} bpm**.", "",
+                  "Ground truth uses simulator R timing or original MIT-BIH beat annotations.",
+                  "These are clean, aligned, known-calibration rendered strips; they do not establish",
+                  "accuracy on photographs or twelve-lead layouts. All cases use the same measured pipeline",
+                  "and no LLM / dataset training. Synthetic noisy cases use seed 7, 0.015 mV white noise,",
+                  "0.08 mV 50 Hz interference and 0.15 mV baseline drift. Irregularity is timing only.", ""])
+    output_dir.mkdir(parents=True, exist_ok=True)
+    markdown = "\n".join(lines)
+    (output_dir / "digitization.md").write_text(markdown, encoding="utf-8")
+    (output_dir / "digitization.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(markdown)
+    return summary
+
+
 if __name__ == "__main__":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=cfg.DATA_DIR)
     parser.add_argument("--output-dir", type=Path, default=cfg.RESULTS_DIR)
+    parser.add_argument("--images", action="store_true", help="Validate calibrated image round trips instead of raw MIT-BIH detection.")
     args = parser.parse_args()
+    if args.images:
+        sys.exit(0 if run_image_validation(args.output_dir)["passed"] else 1)
     sys.exit(0 if run_validation(args.data_dir, args.output_dir)["gate_passed"] else 1)

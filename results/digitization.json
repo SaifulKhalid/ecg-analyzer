@@ -1,0 +1,120 @@
+{
+  "generated_utc": "2026-11-22T09:41:08.806357+00:00",
+  "cases": [
+    {
+      "case": "Synthetic 45 bpm / 6 px/mm",
+      "true_hr": 44.994375703037115,
+      "measured_hr": 44.994,
+      "absolute_error": 0.0003757030371147607,
+      "pixels_per_mm": 5.9991,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 72 bpm / 6 px/mm",
+      "true_hr": 72.00886262924666,
+      "measured_hr": 71.982,
+      "absolute_error": 0.026862629246664937,
+      "pixels_per_mm": 5.9991,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 130 bpm / 6 px/mm",
+      "true_hr": 130.01083423618635,
+      "measured_hr": 130.011,
+      "absolute_error": 0.00016576381364075132,
+      "pixels_per_mm": 5.9995,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 45 bpm / 8 px/mm",
+      "true_hr": 44.994375703037115,
+      "measured_hr": 44.994,
+      "absolute_error": 0.0003757030371147607,
+      "pixels_per_mm": 7.9995,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 72 bpm / 8 px/mm",
+      "true_hr": 72.00886262924666,
+      "measured_hr": 71.982,
+      "absolute_error": 0.026862629246664937,
+      "pixels_per_mm": 7.9994,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 130 bpm / 8 px/mm",
+      "true_hr": 130.01083423618635,
+      "measured_hr": 129.964,
+      "absolute_error": 0.04683423618635629,
+      "pixels_per_mm": 7.9996,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 45 bpm / 12 px/mm",
+      "true_hr": 44.994375703037115,
+      "measured_hr": 44.994,
+      "absolute_error": 0.0003757030371147607,
+      "pixels_per_mm": 11.9996,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 72 bpm / 12 px/mm",
+      "true_hr": 72.00886262924666,
+      "measured_hr": 72.009,
+      "absolute_error": 0.00013737075333608573,
+      "pixels_per_mm": 11.9996,
+      "quality": "ok"
+    },
+    {
+      "case": "Synthetic 130 bpm / 12 px/mm",
+      "true_hr": 130.01083423618635,
+      "measured_hr": 130.011,
+      "absolute_error": 0.00016576381364075132,
+      "pixels_per_mm": 11.9996,
+      "quality": "ok"
+    },
+    {
+      "case": "Irregular RR",
+      "true_hr": 75.86705202312137,
+      "measured_hr": 75.84,
+      "absolute_error": 0.027052023121370894,
+      "pixels_per_mm": 7.9987,
+      "quality": "ok"
+    },
+    {
+      "case": "Inverted trace",
+      "true_hr": 74.99999999999999,
+      "measured_hr": 74.971,
+      "absolute_error": 0.02899999999998215,
+      "pixels_per_mm": 7.9987,
+      "quality": "ok"
+    },
+    {
+      "case": "Fractional spacing",
+      "true_hr": 74.99999999999999,
+      "measured_hr": 75.087,
+      "absolute_error": 0.08700000000001751,
+      "pixels_per_mm": 7.5093,
+      "quality": "ok"
+    },
+    {
+      "case": "50 mm/s / 5 mm/mV overrides",
+      "true_hr": 91.991341991342,
+      "measured_hr": 91.991,
+      "absolute_error": 0.00034199134199752734,
+      "pixels_per_mm": 8.0,
+      "quality": "ok"
+    },
+    {
+      "case": "MIT-BIH 100 / first 12 s",
+      "true_hr": 73.88223796726116,
+      "measured_hr": 73.84,
+      "absolute_error": 0.04223796726115836,
+      "pixels_per_mm": 7.9943,
+      "quality": "ok"
+    }
+  ],
+  "mean_absolute_hr_error": 0.02055624884972675,
+  "max_absolute_hr_error": 0.08700000000001751,
+  "passed": true
+}

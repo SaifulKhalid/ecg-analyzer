@@ -15,8 +15,8 @@ permitted helper second opinion.
 | 1 Core DSP + gate | 75 min | Complete | 3.3 min | Record 100: 100% / 100%; means: 99.78% / 100%; 20 DSP tests pass |
 | 2 Rules + LLM + API | 45 min | Complete | 11.8 min | 38 Python + 27 Node tests pass; signal API works; provider rejects required temperature |
 | 3 UI + plots | 60 min | Complete | 21.0 min | Desktop / mobile real demos pass, four plots visible, build passes on Node 22.18 |
-| 4 Image digitizer | 75 min | In progress | 0 | Start 09:23:14 UTC; single lead; manual pixels/mm fallback if needed |
-| 5 GPT comparison | 25 min | Pending | 0 | Unavailable GPT calls must be marked not run, never fabricated |
+| 4 Image digitizer | 75 min | Complete | 30 min | 18 image tests, 14-case round-trip gate, actual browser multipart upload pass |
+| 5 GPT comparison | 25 min | In progress | 0 | Started 09:53 UTC; fixed 10 cases, matched images, bounded API calls |
 | 6 Wrap + checks | 5 min | Pending | 0 | Full pytest + existing Node tests, reproducible README |
 
 ## Recon and assumptions
@@ -66,13 +66,16 @@ permitted helper second opinion.
 - Existing Node 22.14 runs the local server but cannot load the installed
   Cloudflare plugin's TypeScript config (requires 22.18+). Use isolated cached
   Node 22.18 for the build; correct package engine and README requirements.
+- A new `sample_ECG_image.png` appeared during work: 600×333, twelve-lead layout
+  with a bottom rhythm strip. Treat it as user input, preserve it, and exclude
+  it from Git. Whole multi-lead images need an explicit single-lead crop.
 
 ## Definition of done
 
 - [x] `validate.py` table exists with real numbers
 - [x] Demo dropdown works end to end
 - [x] `/analyze-signal` works
-- [ ] `/analyze` works on a rendered grid image
+- [x] `/analyze` works on a rendered grid image
 - [x] Production GPT gets measured JSON only
 - [ ] `comparison.md` exists
 - [ ] `pytest` passes
@@ -125,3 +128,30 @@ permitted helper second opinion.
   harness to respect the app's existing CSP. Inspected both full-page screenshots.
 - 09:23:14 UTC — Phase 3 complete; existing cf build passes under isolated
   Node 22.18 (no deployment). Start phase 4; all phase boxes remain within budget.
+- 09:25 UTC — Git audit found the private bridge was missed in phase 2 staging;
+  committed it immediately in a small corrective commit. No data or secrets
+  were staged. Read the newly supplied multi-lead sample locally only.
+- 09:38 UTC — Image tests pass after correcting two real extraction issues:
+  faint antialiased minor-grid lines need a lower saturation cutoff; dark trace
+  ink must be retained at colored grid crossings, and component cleanup must
+  preserve almost all trace columns. No detector logic was changed.
+- 09:41 UTC — `python scripts/validate.py --images`: 14/14 pass, including real
+  MIT-BIH 100 / first 12 s against annotation-derived HR. MAE 0.021 bpm, maximum
+  0.087 bpm; 6 / 8 / 12 px/mm, fractional spacing, irregularity, inversion and
+  50 mm/s / 5 mm/mV overrides. These clean rendered images are not photo accuracy.
+  New API multipart and bad-input checks mock the LLM.
+- 09:43 UTC — The local sample works with manual 2.4 px/mm and crop
+  [35,224,555,294]: 11 beats, measured HR 74.59 bpm. Scale is assumed / supplied,
+  so this is a functional example, not ground-truth accuracy evidence. Whole
+  multi-lead layouts are rejected; no automatic clinical lead selection.
+- 09:49 UTC — Verified search-back with one deliberately attenuated synthetic
+  beat: recovered it, matched all 35 beats with no extra events. Added the
+  meaningful regression test without changing detector thresholds.
+- 09:49:17 UTC — Actual browser image upload passes through Node -> multipart
+  FastAPI -> auto digitizer -> the same DSP pipeline, with 71.98 bpm / 8 px/mm
+  and a visible debug overlay. The supplied twelve-lead image also works via
+  manual bottom-strip crop, with its calibration assumptions explicitly recorded.
+  Desktop / mobile flows still have no console errors. No image fallback needed.
+- 09:53 UTC — Phase 4 complete and committed. Begin the 25-minute comparison
+  box: use 10 predeclared synthetic cases, exact same calibrated PNG per method,
+  annotation-like simulator R timing for true HR, and no training or cherry-picking.

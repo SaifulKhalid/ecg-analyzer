@@ -10,6 +10,8 @@ __pycache__/
 .pytest_cache/
 .helper-prompts/
 results/images/
+# Local input supplied while the mission was running; preserve without committing.
+/sample_ECG_image.png
 test-results/
 *.log
 .cloudflare/

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from ecg.features import extract_features
-from ecg.peaks import detect_r_peaks
+from ecg.peaks import detect_r_peaks, pan_tompkins
 from ecg.preprocess import preprocess
 from ecg.synth import generate_ecg
 from scripts.validate import match_beats
@@ -78,3 +78,14 @@ def test_bad_signal_inputs_fail_before_processing(samples, fs):
 def test_flat_signal_produces_no_beats():
     processed = preprocess(np.zeros(2500), 250)
     assert detect_r_peaks(processed.filtered).size == 0
+
+
+def test_search_back_recovers_a_low_amplitude_beat_without_extra_events():
+    generated = generate_ecg(72, duration=30, noise=0)
+    weak_peak = int(generated.r_peaks[12])
+    generated.signal.samples[weak_peak - 75:weak_peak + 125] *= 0.35
+    processed = preprocess(generated.signal)
+    detected = pan_tompkins(processed.filtered, processed.fs)
+    matched = match_beats(generated.r_peaks / generated.signal.fs, detected.indices / processed.fs)
+    assert detected.searchback_count >= 1
+    assert (matched["tp"], matched["fp"], matched["fn"]) == (35, 0, 0)

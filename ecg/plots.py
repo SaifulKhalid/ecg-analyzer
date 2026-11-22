@@ -9,7 +9,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 
 from . import config as cfg
-from .preprocess import Preprocessed
+from .preprocess import Preprocessed, Signal
 
 _plot_lock = threading.Lock()  # Matplotlib font caches are shared across API threads.
 
@@ -97,3 +97,53 @@ def render_plots(processed: Preprocessed, r_peaks: np.ndarray) -> dict[str, str]
         axis.set_xlim(0, duration)
         plots["rr_tachogram"] = _encode(figure)
         return plots
+
+
+def render_ecg_image(signal: Signal, *, pixels_per_mm: float = cfg.RENDER_PIXELS_PER_MM,
+                     paper_speed: float = cfg.PAPER_SPEED_MM_S, gain: float = cfg.GAIN_MM_MV,
+                     grid: bool = True) -> bytes:
+    """Render a calibrated single-lead strip for round trips / fair benchmarks.
+
+    The header contains paper speed / voltage gain only, never ground-truth HR,
+    rhythm or simulator labels. There are no horizontal margins, so the image
+    and its source signal share the same duration. Calibration is in physical
+    mm, independent of the screenshot resolution.
+    """
+    if min(pixels_per_mm, paper_speed, gain) <= 0:
+        raise ValueError("Rendering calibration values must be positive.")
+    samples = np.asarray(signal.samples, dtype=float)
+    centered = samples - np.median(samples)
+    duration = samples.size / signal.fs
+    width_mm = duration * paper_speed
+    height_mm = max(cfg.RENDER_HEIGHT_MM,
+                    float(np.ceil(2 * np.max(np.abs(centered)) * gain + cfg.RENDER_VOLTAGE_MARGIN_MM)))
+    width_px = int(round(width_mm * pixels_per_mm))
+    trace_height_px = int(round(height_mm * pixels_per_mm))
+    total_height_px = trace_height_px + cfg.RENDER_HEADER_PIXELS
+    with _plot_lock:
+        figure = Figure(figsize=(width_px / cfg.RENDER_DPI, total_height_px / cfg.RENDER_DPI),
+                        dpi=cfg.RENDER_DPI, facecolor="white")
+        axis = figure.add_axes([0, 0, 1, trace_height_px / total_height_px])
+        axis.set_xlim(0, width_mm)
+        axis.set_ylim(-height_mm / 2, height_mm / 2)
+        axis.set_axis_off()
+        if grid:
+            for position in np.arange(0, width_mm + 1, 1):
+                major = position % 5 == 0
+                axis.axvline(position, color="#eb9eaa" if major else "#ffd0da",
+                             linewidth=cfg.RENDER_MAJOR_LINEWIDTH if major else cfg.RENDER_MINOR_LINEWIDTH,
+                             zorder=0)
+            for position in np.arange(np.ceil(-height_mm / 2), np.floor(height_mm / 2) + 1):
+                major = position % 5 == 0
+                axis.axhline(position, color="#eb9eaa" if major else "#ffd0da",
+                             linewidth=cfg.RENDER_MAJOR_LINEWIDTH if major else cfg.RENDER_MINOR_LINEWIDTH,
+                             zorder=0)
+        axis.plot(np.arange(samples.size) / signal.fs * paper_speed, centered * gain,
+                  color="#111111", linewidth=cfg.RENDER_TRACE_LINEWIDTH, zorder=2)
+        figure.text(0.008, 1 - cfg.RENDER_HEADER_PIXELS / (2 * total_height_px),
+                    f"Single lead | {paper_speed:g} mm/s | {gain:g} mm/mV", va="center", fontsize=9,
+                    color="#222222")
+        buffer = io.BytesIO()
+        FigureCanvasAgg(figure).print_png(buffer)
+        figure.clear()
+        return buffer.getvalue()
