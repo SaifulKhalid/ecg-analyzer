@@ -34,6 +34,7 @@ class Preprocessed:
     raw_power: np.ndarray
     filtered_power: np.ndarray
     warnings: list[str] = field(default_factory=list)
+    notch_hz: float | None = cfg.NOTCH_HZ
 
     @property
     def time(self) -> np.ndarray:
@@ -96,4 +97,4 @@ def preprocess(samples: np.ndarray | Signal, fs: float | None = None,
     frequencies, raw_power = power_spectrum(raw, cfg.FS_TARGET)
     _, filtered_power = power_spectrum(cleaned, cfg.FS_TARGET)
     return Preprocessed(raw, cleaned, cfg.FS_TARGET, float(fs), frequencies,
-                        raw_power, filtered_power, warnings)
+                        raw_power, filtered_power, warnings, notch_hz)

@@ -57,7 +57,7 @@ async function readJson(req) {
 }
 
 // Inject the DSP fetch for tests; this server never sends images to GPT.
-export function createApp({ fetchImpl = fetch, dspUrl = process.env.ECG_API_URL || 'http://127.0.0.1:8000' } = {}) {
+export function createApp({ fetchImpl = fetch, dspUrl = process.env.ECG_API_URL || 'http://127.0.0.1:8765' } = {}) {
   return createServer(async (req, res) => {
     for (const [name, value] of Object.entries(securityHeaders)) res.setHeader(name, value);
 
@@ -117,7 +117,7 @@ export function createApp({ fetchImpl = fetch, dspUrl = process.env.ECG_API_URL 
         return sendJson(res, error.status || (controller.signal.aborted ? 504 : 503), {
           error: error.status ? error.message : controller.signal.aborted
             ? 'The analysis took too long. Please try again.'
-            : 'Could not reach the ECG DSP service. Start FastAPI on port 8000 or set ECG_API_URL.',
+            : 'Could not reach the ECG DSP service. Start FastAPI on port 8765 or set ECG_API_URL.',
         });
       } finally {
         clearTimeout(timeout);

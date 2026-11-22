@@ -13,9 +13,9 @@ permitted helper second opinion.
 | --- | ---: | --- | ---: | --- |
 | 0 Recon + skeleton | 15 min | Complete | 13.4 min | Baseline + skeleton; pinned environment; all five MIT-BIH records cached |
 | 1 Core DSP + gate | 75 min | Complete | 3.3 min | Record 100: 100% / 100%; means: 99.78% / 100%; 20 DSP tests pass |
-| 2 Rules + LLM + API | 45 min | Complete | 12.5 min | 38 Python + 27 Node tests pass; signal API works; provider rejects required temperature |
-| 3 UI + plots | 60 min | In progress | 0 | Start 09:03 UTC; preserve existing styling, add demo/results panel |
-| 4 Image digitizer | 75 min | Pending | 0 | If auto grid fails, require explicit pixels/mm; single-lead only |
+| 2 Rules + LLM + API | 45 min | Complete | 11.8 min | 38 Python + 27 Node tests pass; signal API works; provider rejects required temperature |
+| 3 UI + plots | 60 min | Complete | 21.0 min | Desktop / mobile real demos pass, four plots visible, build passes on Node 22.18 |
+| 4 Image digitizer | 75 min | In progress | 0 | Start 09:23:14 UTC; single lead; manual pixels/mm fallback if needed |
 | 5 GPT comparison | 25 min | Pending | 0 | Unavailable GPT calls must be marked not run, never fabricated |
 | 6 Wrap + checks | 5 min | Pending | 0 | Full pytest + existing Node tests, reproducible README |
 
@@ -60,12 +60,17 @@ permitted helper second opinion.
   with reasoning disabled. Keep the requested temperature and return null
   explanation plus provider error; do not silently change it. The image-only
   comparison has no mandated temperature and uses the original model default.
-- Plot response slot is implemented; actual figures are the phase 3 task.
+- Live Windows bind to 8000 failed with WSAEACCES (10013); excluded-port listings
+  do not explain it. Port 8765 binds successfully, so choose 8765 as the default
+  DSP port everywhere. `ECG_API_URL` remains an override. No OS settings changed.
+- Existing Node 22.14 runs the local server but cannot load the installed
+  Cloudflare plugin's TypeScript config (requires 22.18+). Use isolated cached
+  Node 22.18 for the build; correct package engine and README requirements.
 
 ## Definition of done
 
 - [x] `validate.py` table exists with real numbers
-- [ ] Demo dropdown works end to end
+- [x] Demo dropdown works end to end
 - [x] `/analyze-signal` works
 - [ ] `/analyze` works on a rendered grid image
 - [x] Production GPT gets measured JSON only
@@ -104,3 +109,19 @@ permitted helper second opinion.
   All 9 demos pass quality; 38 Python tests and 27 Node tests pass. Live call
   demonstrates graceful provider failure at the requested temperature. No
   phase overrun or fallback needed beyond the explicitly allowed null explanation.
+- 09:14 UTC — Plot API tests pass (9). Real /health and /samples work through
+  Node :3000 -> FastAPI :8765; catalog has all 9 demos. agy modified style.css
+  only; reviewed the entire diff, removed a global overflow-hiding rule, and
+  bounded the JSON panel height. Core algorithms were not delegated.
+- 09:17 UTC — Playwright Python expects browser build 1255 but the installed
+  cache has 1254. Use the existing cached Chromium executable (or system Edge),
+  with no added runtime dependency. Build uses an isolated Node 22.18 runtime.
+- 09:21:43 UTC — Browser verification passes on desktop (1280 px) and mobile
+  (390 px): actual MIT-BIH 100 demo returns 74 beats and 73.87 bpm, all four PNG
+  plots load, three metric cards, no horizontal overflow or console errors.
+  An irregular synthetic demo shows screening evidence; mock-only explanation
+  renders five sections and never executes HTML. Preview / removal preserved.
+  `results/ui-verification.md` records the flow. Used locator waits in the QA
+  harness to respect the app's existing CSP. Inspected both full-page screenshots.
+- 09:23:14 UTC — Phase 3 complete; existing cf build passes under isolated
+  Node 22.18 (no deployment). Start phase 4; all phase boxes remain within budget.

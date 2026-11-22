@@ -52,3 +52,9 @@ def analyze_signal_endpoint(body: SignalRequest) -> dict:
         return analyze_signal(signal, explain=body.explain, notch_hz=body.notch_hz)
     except (ValueError, OSError) as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("ecg.api:app", host=cfg.API_HOST, port=cfg.API_PORT)

@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "mitdb"
 RESULTS_DIR = ROOT / "results"
 DISCLAIMER = "Educational screening tool, not a medical device."
+API_HOST = "127.0.0.1"
+API_PORT = 8765
 
 FS_TARGET = 250
 BANDPASS_HZ = (0.5, 40.0)
@@ -85,6 +87,7 @@ RENDER_HEIGHT_MM = 30.0
 RENDER_DPI = 100
 PLOT_MAX_SECONDS = 10.0
 PLOT_DPI = 110
+PLOT_SPECTRUM_MAX_HZ = 80.0
 
 AGENTROUTER_URL = "https://agentrouter.org/v1/responses"
 AGENTROUTER_PRIMARY_MODEL = "gpt-5.6-sol"

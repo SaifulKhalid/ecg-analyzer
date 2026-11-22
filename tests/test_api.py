@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import base64
 
 from ecg.synth import generate_ecg
 
@@ -14,7 +15,9 @@ def test_health_catalog_and_demo_flow(api_client):
     assert code == 200 and result["status"] == "ok"
     assert abs(result["measurements"]["hr_mean_bpm"] - 72) < 1
     assert len(calls) == 1 and result["explanation"]["Summary"]
-    assert "plots" in result and "warnings" in result
+    assert set(result["plots"]) == {"raw_filtered", "spectrum", "r_peaks", "rr_tachogram"}
+    assert all(base64.b64decode(png).startswith(b"\x89PNG\r\n\x1a\n") for png in result["plots"].values())
+    assert "warnings" in result
     assert result["disclaimer"] == "Educational screening tool, not a medical device."
 
 
