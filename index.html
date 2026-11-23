@@ -18,19 +18,8 @@
         <div class="input-controls">
           <input id="image-input" type="file" accept="image/*" hidden>
           <button id="choose-file" type="button">Choose file</button>
-          <select id="demo-select" aria-label="Sample record"><option value="">Sample record</option></select>
           <button id="analyze-button" type="submit" disabled>Analyze</button>
         </div>
-        <details id="calibration">
-          <summary>Calibration</summary>
-          <div class="calibration-fields">
-            <label>Pixels per mm<input id="pixels-per-mm" type="number" min="0.01" step="any"></label>
-            <label>Paper speed (mm/s)<input id="paper-speed" type="number" min="1" step="any" value="25"></label>
-            <label>Gain (mm/mV)<input id="gain" type="number" min="0.01" step="any" value="10"></label>
-            <label>Crop (left, top, right, bottom)<input id="crop-box" type="text" placeholder="automatic"></label>
-            <label>Mains frequency (Hz)<select id="notch-hz"><option value="50">50</option><option value="60">60</option></select></label>
-          </div>
-        </details>
       </form>
     </section>
     <section id="result-section" aria-live="polite" hidden>

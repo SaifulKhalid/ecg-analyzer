@@ -65,10 +65,10 @@ Start the existing frontend in another terminal:
 npm start
 ```
 
-Open **http://localhost:3000**, choose a **Sample record** or **Choose file**, and
-select **Analyze**. Five MIT-BIH records appear when downloaded; four synthetic
-records work offline. The collapsed **Calibration** fields accept scale, speed,
-gain, crop and mains frequency. The page displays measurements only.
+Open **http://localhost:3000**, select **Choose file**, upload an ECG image, and
+select **Analyze**. The page uses automatic region selection and calibration,
+with defaults of 25 mm/s paper speed, 10 mm/mV gain and 50 Hz mains frequency.
+Raw signals, sample records and manual calibration remain available through the API.
 
 Backend default: **127.0.0.1:8765**. Port 8000 was blocked on this Windows machine.
 To choose another port, run `python -m uvicorn ecg.api:app --port PORT_NUMBER` in

@@ -1,10 +1,9 @@
 const imageInput = document.querySelector('#image-input');
-const demoSelect = document.querySelector('#demo-select');
 const analyzeButton = document.querySelector('#analyze-button');
 const resultSection = document.querySelector('#result-section');
 const result = document.querySelector('#result');
 let selectedFile = null, preview = '', currentReport = null;
-let resized = false, uploadScale = 1, busy = false, generation = 0;
+let resized = false, busy = false, generation = 0;
 
 function element(tag, text) {
   const node = document.createElement(tag);
@@ -90,8 +89,8 @@ function renderReport(data) {
 
 function setBusy(value) {
   busy = value;
-  for (const control of document.querySelectorAll('#input-form button, #input-form input, #input-form select')) control.disabled = value;
-  analyzeButton.disabled = value || (!selectedFile && !demoSelect.value);
+  for (const control of document.querySelectorAll('#input-form button, #input-form input')) control.disabled = value;
+  analyzeButton.disabled = value || !selectedFile;
   resultSection.setAttribute('aria-busy', String(value));
 }
 async function prepareUpload(file) {
@@ -103,7 +102,7 @@ async function prepareUpload(file) {
   const url = await readImage(file), img = new Image();
   try {
     img.src = url; await img.decode();
-    if (file.size <= 3_500_000) return { file, preview: url, resized: false, scale: 1 };
+    if (file.size <= 3_500_000) return { file, preview: url, resized: false };
     let scale = Math.min(1, 3000 / Math.max(img.naturalWidth, img.naturalHeight));
     const canvas = document.createElement('canvas'); let blob;
     for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -116,51 +115,31 @@ async function prepareUpload(file) {
     }
     if (!blob || blob.size > 3_500_000) throw new Error('input');
     URL.revokeObjectURL(url);
-    return { file: new File([blob], file.name, { type: 'image/jpeg' }), preview: await readImage(blob), resized: true, scale };
+    return { file: new File([blob], file.name, { type: 'image/jpeg' }), preview: await readImage(blob), resized: true };
   } catch (error) { URL.revokeObjectURL(url); throw error; }
 }
 document.querySelector('#choose-file').addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', async () => {
   const ticket = ++generation; selectedFile = null;
   if (preview) URL.revokeObjectURL(preview);
-  preview = ''; resized = false; uploadScale = 1; resultSection.hidden = true;
+  preview = ''; resized = false; resultSection.hidden = true;
   const file = imageInput.files[0]; if (!file) { setBusy(false); return; }
   setBusy(true);
   try {
     const prepared = await prepareUpload(file);
     if (ticket !== generation) { URL.revokeObjectURL(prepared.preview); return; }
-    selectedFile = prepared.file; preview = prepared.preview; resized = prepared.resized; uploadScale = prepared.scale; demoSelect.value = '';
+    selectedFile = prepared.file; preview = prepared.preview; resized = prepared.resized;
   } catch { imageInput.value = ''; }
   finally { if (ticket === generation) setBusy(false); }
 });
-demoSelect.addEventListener('change', () => {
-  generation += 1; selectedFile = null; resized = false;
-  if (preview) URL.revokeObjectURL(preview);
-  preview = ''; imageInput.value = ''; resultSection.hidden = true; setBusy(false);
-});
 document.querySelector('#input-form').addEventListener('submit', async event => {
-  event.preventDefault(); if (busy || (!selectedFile && !demoSelect.value)) return;
-  const notch_hz = Number(document.querySelector('#notch-hz').value); let body, path;
-  if (selectedFile) {
-    body = new FormData(); path = '/analyze'; body.set('image', selectedFile, selectedFile.name);
-    for (const [id, name] of [['pixels-per-mm', 'pixels_per_mm'], ['paper-speed', 'paper_speed'], ['gain', 'gain']]) {
-      const value = document.getElementById(id).value.trim();
-      if (value && (!Number.isFinite(Number(value)) || Number(value) <= 0)) return;
-      if (value) body.set(name, name === 'pixels_per_mm' ? String(Number(value) * uploadScale) : value);
-    }
-    const crop = document.querySelector('#crop-box').value.trim();
-    if (crop) {
-      const bounds = crop.split(',').map(value => Number(value.trim()));
-      if (bounds.length !== 4 || !bounds.every(Number.isInteger) || bounds.some(value => value < 0) || bounds[2] <= bounds[0] || bounds[3] <= bounds[1]) return;
-      body.set('crop_box', JSON.stringify(bounds.map(value => Math.round(value * uploadScale))));
-    }
-    body.set('explain', 'false'); body.set('notch_hz', String(notch_hz));
-  } else { path = '/analyze-signal'; body = { sample_id: demoSelect.value, explain: false, notch_hz }; }
+  event.preventDefault(); if (busy || !selectedFile) return;
+  const body = new FormData();
+  body.set('image', selectedFile, selectedFile.name);
+  body.set('explain', 'false');
   setBusy(true); resultSection.hidden = true;
   try {
-    const form = body instanceof FormData;
-    const response = await fetch(path, { method: 'POST', ...(form ? {} : { headers: { 'Content-Type': 'application/json' } }),
-      body: form ? body : JSON.stringify(body), signal: AbortSignal.timeout(130_000) });
+    const response = await fetch('/analyze', { method: 'POST', body, signal: AbortSignal.timeout(130_000) });
     const data = await response.json(); if (!response.ok) return;
     renderReport(data); resultSection.hidden = false;
   } catch { /* No transport-error text is included in the copy deck. */ }
@@ -172,11 +151,3 @@ document.querySelector('#download-json').addEventListener('click', () => {
   const link = element('a'); link.href = url; link.download = 'ecg-measurements.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 document.querySelector('#print-button').addEventListener('click', () => window.print());
-async function loadSamples() {
-  try {
-    const response = await fetch('/samples', { signal: AbortSignal.timeout(10_000) }); const samples = await response.json();
-    if (!response.ok || !Array.isArray(samples)) return;
-    for (const sample of samples) { const option = element('option', sample.sample_id); option.value = sample.sample_id; demoSelect.append(option); }
-  } catch { /* A file remains an input when the catalog is unavailable. */ }
-}
-loadSamples();
