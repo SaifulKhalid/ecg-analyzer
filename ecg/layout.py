@@ -214,7 +214,7 @@ def _trim_leading_pulse(mask, box):
         if start < strip.shape[1]*0.12 and max(8, strip.shape[1]*0.008) <= end-start <= strip.shape[1]*0.08:
             # A sustained square plateau differs from a narrow R apex. Trim
             # the plateau, falling edge and a small baseline margin.
-            return [min(right-1, left+end+max(3, round(strip.shape[1]*0.012))), top, right, bottom]
+            return [min(right-1, left+int(end)+max(3, round(strip.shape[1]*0.012))), top, right, bottom]
     return box
 
 

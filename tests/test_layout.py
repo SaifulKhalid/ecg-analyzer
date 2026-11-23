@@ -183,6 +183,28 @@ def test_leading_calibration_pulse_is_trimmed_without_changing_hr():
     assert abs(selection.result["measurements"]["hr_mean_bpm"]-72) <= 3
 
 
+def test_trimmed_calibration_pulse_upload_returns_json_over_http(api_client):
+    picture = Image.new("RGB", (600, 160), "white")
+    ImageDraw.Draw(picture).line(
+        [(20, 100), (26, 100), (26, 50), (42, 50), (42, 100),
+         (180, 100), (185, 70), (190, 100), (380, 100), (385, 70),
+         (390, 100), (580, 100)], fill="black", width=1)
+    boundary = "calibration-pulse-regression"
+    data = (
+        f"--{boundary}\r\nContent-Disposition: form-data; name=\"explain\"\r\n\r\nfalse\r\n"
+        f"--{boundary}\r\nContent-Disposition: form-data; name=\"image\"; filename=\"pulse.png\"\r\n"
+        "Content-Type: image/png\r\n\r\n"
+    ).encode() + _image_bytes(picture) + f"\r\n--{boundary}--\r\n".encode()
+    request, calls = api_client
+    code, result = request("/analyze", data=data,
+                           headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
+    assert code == 200
+    assert result["status"] in ("ok", "insufficient_quality")
+    assert result["region_selection"]["box"][0] > 20
+    assert result["region_selection"]["candidates"]
+    assert not calls
+
+
 def test_full_prepared_image_overlay_changes_only_selected_region():
     result = _call_image_api(render_report().image)
     original = np.array(Image.open(io.BytesIO(base64.b64decode(result["plots"]["prepared_image"]))).convert("RGB"))
