@@ -86,11 +86,6 @@ function renderReport(data) {
     row.insertCell().textContent = value; row.insertCell().textContent = unit;
   }
   result.append(table);
-  const notes = reportNotes(data);
-  if (notes.length) {
-    result.append(element('h2', 'Notes'));
-    for (const line of notes) { const note = element('p', line); note.className = 'note'; result.append(note); }
-  }
 }
 
 function setBusy(value) {

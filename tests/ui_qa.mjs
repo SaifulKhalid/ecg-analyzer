@@ -66,11 +66,11 @@ for (const width of [1280, 390]) {
     assert.equal(info.figures.length, input === 'sample' ? 4 : 6);
     info.figures.forEach((caption, index) => assert.match(caption, new RegExp(`^Figure ${index+1}\\. .+\\.$`)));
     assert.equal(info.rows.length, 11);
-    assert.equal(info.text.split('Educational tool, not a medical device.').length - 1, 1);
+    assert.doesNotMatch(info.text, /\bNotes\b|Educational tool, not a medical device|Interpretation is left to a qualified clinician/);
     assert.doesNotMatch(info.text, /Completed in|Limitations|Refresh demo|Inspect measured|Measuring/);
     await writeFile(`test-results/${label}-${input}-${width}-dom.txt`, info.text);
     assert.equal(await evaluate(`document.querySelector('#crop-box').value`), '');
-    if (input === 'sample') assert.equal(info.notes.length, 0);
+    assert.equal(info.notes.length, 0);
     if (label !== 'part-b' && input === 'image') assert.equal(info.outline, true);
     if (info.outline) {
       const border = await evaluate(`getComputedStyle(document.querySelector('.region-outline')).borderTopWidth`);
@@ -90,7 +90,7 @@ for (const width of [1280, 390]) {
     const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true,
       clip: { x: 0, y: 0, width, height: height+128, scale: 1 } });
     await writeFile(`test-results/${label}-${input}-${width}.png`, Buffer.from(shot.data, 'base64'));
-    const whitelist = /^(ECG Analyzer|Single-lead ECG signal measurement|Input|Choose file|Sample record|mitdb-\d+|synth-[a-z]+|Analyze|Calibration|Pixels per mm|Paper speed \(mm\/s\)|Gain \(mm\/mV\)|Crop \(left, top, right, bottom\)|Mains frequency \(Hz\)|50|60|Figure \d+\. .+\.|Table 1\. Measured values\.|Parameter\s+Value\s+Unit|Record duration|Sampling rate after resampling|R peaks detected|Mean heart rate|Minimum \/ maximum heart rate|Mean RR interval|SDNN|RMSSD|pNN50|RR coefficient of variation|Signal-to-noise ratio|Notes|Download JSON|Print|Educational tool, not a medical device\. Interpretation is left to a qualified clinician\.|[-\d.na\/\s]+|s|Hz|bpm|ms|%|dB)$/;
+    const whitelist = /^(ECG Analyzer|Single-lead ECG signal measurement|Input|Choose file|Sample record|mitdb-\d+|synth-[a-z]+|Analyze|Calibration|Pixels per mm|Paper speed \(mm\/s\)|Gain \(mm\/mV\)|Crop \(left, top, right, bottom\)|Mains frequency \(Hz\)|50|60|Figure \d+\. .+\.|Table 1\. Measured values\.|Parameter\s+Value\s+Unit|Record duration|Sampling rate after resampling|R peaks detected|Mean heart rate|Minimum \/ maximum heart rate|Mean RR interval|SDNN|RMSSD|pNN50|RR coefficient of variation|Signal-to-noise ratio|Download JSON|Print|[-\d.na\/\s]+|s|Hz|bpm|ms|%|dB)$/;
     const outsideDeck = info.text.split(/[\n\t]/).map(x=>x.trim()).filter(Boolean).filter(line=>!whitelist.test(line) && !['Parameter','Value','Unit'].includes(line) && !info.notes.includes(line) && !line.startsWith('Signal quality below threshold:'));
     assert.deepEqual(outsideDeck, []);
     rows.push({ width, input, figures: info.figures, notes: info.notes, overflow: info.overflow, outsideDeck });
@@ -114,7 +114,7 @@ if (process.env.ECG_QA_LARGE_IMAGE) {
   assert.equal(upload.name, path.basename(large)); assert.equal(upload.type, 'image/jpeg');
   assert.ok(upload.size <= 3_500_000); assert.equal(upload.explain, 'false'); assert.equal(report.status, 'ok');
   assert.ok(Math.max(...report.region.image_size) <= 3000); assert.ok(Math.abs(report.hr-72) <= 3);
-  assert.equal(await evaluate(`[...document.querySelectorAll('.note')].filter(x=>x.innerText==='Image resized before upload.').length`), 1);
+  assert.equal(await evaluate(`document.querySelectorAll('.note').length`), 0);
   const text = await evaluate(`document.body.innerText`);
   assert.doesNotMatch(text, /\b(AI|screening|findings|possible|confidence|insight|powerful|seamless)\b/i);
   assert.equal(await evaluate(`document.documentElement.scrollWidth>innerWidth`), false);
@@ -134,7 +134,7 @@ if (label !== 'part-b') {
     await until(`!document.querySelector('#result-section').hidden && !document.querySelector('#analyze-button').disabled`);
     const state = await evaluate(`({notice:document.querySelector('.quality-notice')?.innerText,hr:document.querySelectorAll('tbody tr')[3]?.cells[1].innerText,notes:[...document.querySelectorAll('.note')].map(x=>x.innerText),table:!!document.querySelector('table'),text:document.body.innerText})`);
     assert.ok(state.notice?.startsWith('Signal quality below threshold:')); assert.equal(state.hr, 'n/a'); assert.equal(state.table, true);
-    assert.equal(new Set(state.notes).size, state.notes.length);
+    assert.equal(state.notes.length, 0);
     assert.doesNotMatch(state.text, /\b(AI|screening|findings|possible|confidence|insight|powerful|seamless)\b/i);
     await writeFile(`test-results/${label}-short-dom.txt`, state.text);
     extra.push({ input: 'short region', hr: state.hr, notes: state.notes, qualityNotice: state.notice });
@@ -152,7 +152,7 @@ if (label !== 'part-b') {
     await until(`!document.querySelector('#result-section').hidden && !document.querySelector('#analyze-button').disabled`);
     const region = await evaluate(`window.__qaReport.region_selection`);
     assert.equal(region.mode, 'manual'); assert.deepEqual(region.box, crop);
-    assert.equal(await evaluate(`[...document.querySelectorAll('.note')].some(x=>x.innerText==='Region set manually.')`), true);
+    assert.equal(await evaluate(`document.querySelectorAll('.note').length`), 0);
     extra.push({ input: 'manual region', box: region.box, mode: region.mode });
   }
   await send('Page.navigate', { url: 'http://127.0.0.1:3000/' });

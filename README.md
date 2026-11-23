@@ -3,7 +3,7 @@
 **Educational screening tool, not a medical device.**
 
 The Node / vanilla web app presents single-lead ECG measurements as a scientific
-report: sequential figures, a measured-values table, input-dependent Notes,
+report: sequential figures, a measured-values table,
 JSON download and printing. The page always requests explain=false and leaves
 interpretation to the clinician. The existing explanation API remains available.
 There is no dataset training.
@@ -265,7 +265,7 @@ curl.exe -F "image=@strip.png" -F "explain=false" http://127.0.0.1:8765/analyze
 - SDNN, RMSSD, pNN50 and CV describe **all detected RR**, including possible ectopy
   and errors. They are not adjudicated NN autonomic HRV; short strips limit interpretation.
 - SNR measures beat-template repeatability; varying morphology can lower it.
-  The report UI shows measurements and input-dependent Notes, with no badges or
+  The report UI shows measurements and quality notices, with no badges or
   interpretation. RR irregularity alone cannot establish AFib.
 - Five MIT-BIH recordings (150.46 minutes) and twenty Gaussian-sum comparison
   images are limited engineering evidence. Clinical screening accuracy and
@@ -320,7 +320,7 @@ idle and can take longer on the first request. Vercel's request/response limit
 is 4.5 MB; uploads below 3.5 MB leave headroom for multipart fields.
 The report UI accepts original files up to 25 MB and resizes files above 3.5 MB
 with canvas (long side <=3000 px, JPEG quality 0.9), preserving the filename.
-It adds only the applicable resize Note. The local API limit remains 10 MB.
+Resize metadata is included in the JSON download. The local API limit remains 10 MB.
 The explanation API retains its strict-temperature and numeric-grounding checks;
 the report UI always sends explain=false.
 

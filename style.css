@@ -36,9 +36,7 @@ th, td { padding: 7px 8px; text-align: left; vertical-align: top; font-weight: 4
 thead th { font-weight: 600; }
 td:nth-child(2) { text-align: right; white-space: nowrap; }
 td:nth-child(3) { white-space: nowrap; }
-.note { margin: 6px 0; overflow-wrap: anywhere; }
 #report-actions { margin-top: 24px; }
-footer { margin-top: 32px; padding-top: 14px; border-top: 1px solid #777; font-size: 0.9rem; }
 @media (max-width: 480px) {
   main { margin: 20px auto; }
   .calibration-fields { grid-template-columns: 1fr; }
@@ -53,5 +51,4 @@ footer { margin-top: 32px; padding-top: 14px; border-top: 1px solid #777; font-s
   figure { break-inside: avoid; page-break-inside: avoid; }
   .image-frame { width: min(100%, calc(215mm * var(--image-ratio, 1))); }
   table { break-inside: avoid; }
-  footer { margin-top: 20px; }
 }
